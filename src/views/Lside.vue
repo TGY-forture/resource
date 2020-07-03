@@ -2,7 +2,7 @@
   <div id="lside">
     <ul>
       <li v-for="item in icon" :key="item.type" class="list">
-        <a-icon :type="item.type" style="fontSize:28px" />
+        <a-icon :type="item.type" style="fontSize:24px" />
         <span>{{ item.name }}</span>
       </li>
     </ul>   

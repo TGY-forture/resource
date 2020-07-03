@@ -1,7 +1,7 @@
 <template>
   <div id="top">
     <p>Fantasy Factory</p>
-    <a-input-search placeholder="请输入产品编号" loading enter-button style="width:300px;margin-right:50px" />     
+    <a-input-search placeholder="请输入产品编号" enter-button style="width:300px;margin-right:50px" />     
     <a-avatar size="default" icon="user" />
     <span class="user">采蘑菇的小菇凉</span>
     <a-icon type="logout" style="font-size:24px" />

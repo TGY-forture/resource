@@ -34,6 +34,7 @@ export default {
   }
   .rside {
     grid-area: 2 / 2 / 11 / 11;
+    position: relative;
   }
 }
 </style>

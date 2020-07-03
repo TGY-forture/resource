@@ -1,15 +1,15 @@
 <template>
   <div>
-    <Home />
+    <Sign />
   </div>
 </template>
 
 <script>
-import Home from '@/components/home/home'
+import Sign from '@/components/home/sign'
 export default {
   name: 'Rside',
   components: {
-    Home
+    Sign
   }
 }
 </script>
