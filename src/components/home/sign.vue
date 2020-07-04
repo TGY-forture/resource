@@ -204,7 +204,7 @@ export default {
     compareToFirstPassword(rule, value, callback) {
       const form = this.form;
       if (value && value !== form.getFieldValue("password")) {
-        callback("Two passwords that you enter is inconsistent!");
+        callback("两次密码不一致!");
       } else {
         callback();
       }

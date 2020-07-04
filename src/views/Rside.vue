@@ -1,15 +1,15 @@
 <template>
   <div>
-    <Sign />
+    <Search />
   </div>
 </template>
 
 <script>
-import Sign from '@/components/home/sign'
+import Search from '@/components/search/search'
 export default {
   name: 'Rside',
   components: {
-    Sign
+    Search
   }
 }
 </script>
