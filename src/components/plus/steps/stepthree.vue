@@ -1,15 +1,15 @@
 <template>
   <div>
-    <slot />
+    
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Rside'
+  name: 'StepThree'
 }
 </script>
 
-<style>
+<style lang="scss">
 
 </style>

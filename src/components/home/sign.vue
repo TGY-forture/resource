@@ -42,6 +42,7 @@
               }
             ]"
             type="password"
+            autocomplete
           />
         </a-form-item>
         <a-form-item
@@ -66,6 +67,7 @@
             ]"
             type="password"
             @blur="handleConfirmBlur"
+            autocomplete
           />
         </a-form-item>
         <a-form-item v-bind="formItemLayout">
@@ -145,9 +147,12 @@
             </a-col>
           </a-row>
         </a-form-item>
-        <a-form-item v-bind="tailFormItemLayout">
+        <a-form-item class="u-btn">
           <a-button type="primary" html-type="submit">
             注册
+          </a-button>
+          <a-button type="primary" html-type="button" class="sign-back" @click="backLog">
+            返回
           </a-button>
         </a-form-item>
       </a-form>
@@ -164,7 +169,7 @@ export default {
       formItemLayout: {
         labelCol: {
           xs: { span: 24 },
-          sm: { span: 8 },
+          sm: { span: 10 },
         },
         wrapperCol: {
           xs: { span: 24 },
@@ -189,6 +194,9 @@ export default {
     this.form = this.$form.createForm(this, { name: "register" });
   },
   methods: {
+    backLog() {
+      this.$router.push('/log')
+    },
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFieldsAndScroll((err, values) => {
@@ -241,6 +249,14 @@ export default {
   }
   .sign-body {
     padding-top: 20px;
+    .u-btn {
+      .ant-form-item-control {
+        text-align: center;
+        .sign-back {
+          margin-left: 20px;
+        }
+      }
+    }    
   }
 }
 </style>

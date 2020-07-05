@@ -1,7 +1,7 @@
 <template>
   <div id="lside">
     <ul>
-      <li v-for="item in icon" :key="item.type" class="list">
+      <li v-for="item in icon" :key="item.type" class="list" @click="jump(item.path)">
         <a-icon :type="item.type" style="fontSize:24px" />
         <span>{{ item.name }}</span>
       </li>
@@ -12,27 +12,33 @@
 let icon = [
   {
     type: 'home',
-    name: '首页'
+    name: '首页',
+    path: 'home'
   },
   {
     type: 'search',
-    name: '搜索信息'
+    name: '搜索信息',
+    path: 'search'
   },
   {
     type: 'plus',
-    name: '添加信息'
+    name: '添加信息',
+    path: 'plus'
   },
   {
     type: 'edit',
-    name: '更改信息'
+    name: '更改信息',
+    path: 'edit'
   },
   {
     type: 'user',
-    name: '用户信息'
+    name: '用户信息',
+    path: 'user'
   },
   {
     type: 'safety-certificate',
-    name: '权限管理'
+    name: '权限管理',
+    path: 'safety-certificate'
   }
 ]
 export default {
@@ -42,7 +48,9 @@ export default {
     }
   },
   methods: {
-    
+    jump(path) {
+      this.$router.push(`/${path}`)
+    }
   }
 };
 </script>

@@ -19,7 +19,7 @@
         <p>我们拥有完善的信息系统，每一把剑都有其身份编号，能随时查询相关信息。</p>
       </div>
     </div>
-    <p class="bot">如果你还没有登录，请前去<span>登录</span></p>
+    <p class="bot">如果你还没有登录，请前去<span @click="toLog">登录</span></p>
     <div class="ask">
       <a-icon type="qq" style="fontSize:25px" />
       <a-icon type="phone" style="fontSize:25px;margin: 0 50px" />
@@ -34,6 +34,11 @@ export default {
   name: 'Home',
   components: {
     Welcome
+  },
+  methods: {
+    toLog() {
+      this.$router.push({name: 'log'})
+    }
   }
 }
 </script>

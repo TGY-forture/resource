@@ -1,8 +1,10 @@
 <template>
   <div id="app">
     <Top class="top" />
-    <Lside class="lside" />
-    <Rside class="rside" />
+    <Lside class="lside" />   
+    <Rside class="rside">
+      <router-view></router-view>
+    </Rside>
   </div>
 </template>
 <script>

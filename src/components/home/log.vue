@@ -62,9 +62,9 @@
           <a-button type="primary" html-type="submit" class="login-form-button">
             登录
           </a-button>
-          <a href="#" class="sign">
+          <a-button class="sign" @click="toSign">
             前往注册
-          </a>
+          </a-button>
         </a-form-item>
       </a-form>
     </section>
@@ -98,6 +98,9 @@ export default {
         }
       });
     },
+    toSign() {
+      this.$router.push('/sign')
+    }
   },
 };
 </script>
@@ -153,8 +156,7 @@ export default {
     }
     .sign {
       display: block;
-      margin-top: 20px;
-      text-align: center;
+      margin: 20px auto 0;
     }
   }
 }

@@ -10,15 +10,7 @@
 
 <script>
 export default {
-  name: 'Top',
-  data() {
-    return {
-      
-    }
-  },
-  methods: {
-    
-  }
+  name: 'Top'
 }
 </script>
 
