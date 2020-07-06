@@ -10,6 +10,7 @@
         type="navigation"
         size="small"
         :style="stepStyle"
+        @change="changeStep"
       >
         <a-step
           title="step1"
@@ -49,7 +50,7 @@ export default {
     };
   },
   beforeCreate() {
-    console.log('dsb')
+    this.$router.push({name: 'stepthree'})
   },
   methods: {
     chan() {
@@ -58,6 +59,15 @@ export default {
         this.loading = false;
         this.$message.success("操作成功!");
       }, 2000);
+    },
+    changeStep(current) {
+      if (current == 0) {
+        this.$router.push({name: 'stepone'})
+      } else if (current == 1) {
+        this.$router.push({name: 'steptwo'})
+      } else if (current == 2) {
+        this.$router.push({name: 'stepthree'})
+      }
     }
   },
 };

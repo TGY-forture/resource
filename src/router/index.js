@@ -52,6 +52,21 @@ const routes = [
         component: () => import('../components/plus/steps/stepthree.vue')
       }
     ]
+  },
+  {
+    path: '/edit',
+    name: 'edit',
+    component: () => import('../components/edit/edit.vue')
+  },
+  {
+    path: '/user',
+    name: 'user',
+    component: () => import('../components/user/user.vue')
+  },
+  {
+    path: '/safety-certificate',
+    name: 'safety-certificate',
+    component: () => import('../components/safety-certificate/safety-certificate.vue')
   }
 ]
 
