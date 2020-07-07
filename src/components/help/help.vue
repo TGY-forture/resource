@@ -8,8 +8,9 @@
         <a-input allow-clear></a-input>
       </a-form-item>
       <a-form-item label="验证码">
-        <a-input allow-clear></a-input>
-        <a-button html-type="button" style="margin-left:30px">发送验证码</a-button>
+        <a-input-search>
+          <a-button slot="enterButton">发送验证码</a-button>
+        </a-input-search>
       </a-form-item>
     </a-form>
     <a-button style="display:block;margin:20px auto" type="primary" html-type="submit">找回密码</a-button>
@@ -18,19 +19,22 @@
 
 <script>
 export default {
-  name: 'Help',
+  name: "Help",
   beforeCreate() {
-    this.form = this.$form.createForm(this, {name: 'help'})
+    this.form = this.$form.createForm(this, { name: "help" });
   }
-}
+};
 </script>
 
 <style lang="scss">
 #help .ant-form {
-  margin-top: 140px;
+  margin-top: 100px;
   .ant-form-item {
-    .ant-input {
+    .ant-input,
+    .ant-input-search {
       width: 220px;
+      display: block;
+      margin: 0 auto;
     }
   }
 }
