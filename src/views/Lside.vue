@@ -39,6 +39,11 @@ let icon = [
     type: 'safety-certificate',
     name: '权限管理',
     path: 'safety-certificate'
+  },
+  {
+    type: 'question-circle',
+    name: '帮助',
+    path: 'help'
   }
 ]
 export default {

@@ -67,6 +67,11 @@ const routes = [
     path: '/safety-certificate',
     name: 'safety-certificate',
     component: () => import('../components/safety-certificate/safety-certificate.vue')
+  },
+  {
+    path: '/help',
+    name: 'help',
+    component: () => import('../components/help/help.vue')
   }
 ]
 
