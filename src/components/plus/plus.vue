@@ -50,7 +50,7 @@ export default {
     };
   },
   beforeCreate() {
-    this.$router.push({name: 'stepthree'})
+    this.$router.push({name: 'stepone'})
   },
   methods: {
     chan() {
