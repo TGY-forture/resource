@@ -2,10 +2,10 @@
   <div id="help">
     <a-form :form="form" :labelCol="{span: 10}">
       <a-form-item label="用户名">
-        <a-input></a-input>
+        <a-input allow-clear></a-input>
       </a-form-item>
       <a-form-item label="邮箱">
-        <a-input></a-input>
+        <a-input allow-clear></a-input>
       </a-form-item>
       <a-form-item label="验证码">
         <a-input-search>
@@ -30,11 +30,8 @@ export default {
 #help .ant-form {
   margin-top: 100px;
   .ant-form-item {
-    .ant-input,
-    .ant-input-search {
+    .ant-input-affix-wrapper, .ant-input-search {
       width: 220px;
-      display: block;
-      margin: 0 auto;
     }
   }
 }
