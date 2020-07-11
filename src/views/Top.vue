@@ -26,6 +26,7 @@ export default {
     font-size: 28px;
     margin-bottom: 0;
     margin-right: auto;
+    cursor: default;
   }
   .user {
     margin-right: 50px;
