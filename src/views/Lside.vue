@@ -22,13 +22,8 @@ let icon = [
   },
   {
     type: 'plus',
-    name: '添加信息',
+    name: '信息记录',
     path: 'plus'
-  },
-  {
-    type: 'edit',
-    name: '更改信息',
-    path: 'edit'
   },
   {
     type: 'user',

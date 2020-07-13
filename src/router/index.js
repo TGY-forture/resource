@@ -39,29 +39,12 @@ const routes = [
   {
     path: '/plus',
     name: 'plus',
-    component: () => import('../components/plus/plus.vue'),
-    children: [
-      {
-        path: 'stepone',
-        name: 'stepone',
-        component: () => import('../components/plus/steps/stepone.vue')
-      },
-      {
-        path: 'steptwo',
-        name: 'steptwo',
-        component: () => import('../components/plus/steps/steptwo.vue')
-      },
-      {
-        path: 'stepthree',
-        name: 'stepthree',
-        component: () => import('../components/plus/steps/stepthree.vue')
-      }
-    ]
+    component: () => import('../components/plus/plus.vue')
   },
   {
-    path: '/edit',
-    name: 'edit',
-    component: () => import('../components/edit/edit.vue')
+    path: '/record',
+    name: 'record',
+    component: () => import('../components/record/record.vue')
   },
   {
     path: '/user',

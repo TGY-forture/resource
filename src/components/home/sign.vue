@@ -33,10 +33,10 @@
                 rules: [
                   {
                     required: true,
-                    message: '请输入你的密码!',
+                    message: '请输入你的密码!'
                   },
                   {
-                    validator: validateToNextPassword,
+                    validator: validateToNextPassword
                   }
                 ]
               }
@@ -57,10 +57,10 @@
                 rules: [
                   {
                     required: true,
-                    message: '请确认你的密码!',
+                    message: '请确认你的密码!'
                   },
                   {
-                    validator: compareToFirstPassword,
+                    validator: compareToFirstPassword
                   }
                 ]
               }
@@ -82,10 +82,14 @@
               'nickname',
               {
                 rules: [
-                  {
+                  {                    
                     required: true,
                     message: '请输入你的昵称!',
-                    whitespace: true,
+                    whitespace: true                   
+                  },
+                  {
+                      max: 10,
+                      message: '昵称不能超过十个字符'
                   }
                 ]
               }
@@ -100,7 +104,11 @@
                 rules: [
                   {
                     required: true,
-                    message: '请输入你的电话号码!',
+                    message: '请输入你的电话号码!'
+                  },
+                  {
+                    len: 11,
+                    message: '电话号码为十一位数字'
                   }
                 ]
               }
@@ -210,19 +218,28 @@ export default {
       this.confirmDirty = this.confirmDirty || !!value;
     },
     compareToFirstPassword(rule, value, callback) {
-      const form = this.form;
-      if (value && value !== form.getFieldValue("password")) {
-        callback("两次密码不一致!");
-      } else {
+      // const form = this.form;
+      if (value === this.form.getFieldValue("password")) {
         callback();
+      } else if (value === '') {
+        callback('')
+      } else {
+        callback("两次密码不一致!")
       }
     },
     validateToNextPassword(rule, value, callback) {
+      let pass = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[\W]).{8}$/
       const form = this.form;
       if (value && this.confirmDirty) {
-        form.validateFields(["confirm"], { force: true });
+        form.validateFields(['confirm'], {force: true})
       }
-      callback();
+      if (pass.test(value)) {
+        callback()
+      } else if (value == undefined) {
+        callback('');
+      } else {
+        callback('密码不符合要求')
+      }
     }    
   }
 };
@@ -239,10 +256,9 @@ export default {
       width: 300px;
       height: 30px;
       text-align: center;
-      cursor: pointer;
       margin-top: 20px;
       margin-bottom: 0;
-      &:hover {
+      &:last-child {
         border-bottom: 3px solid #0984e3;
       }
     }

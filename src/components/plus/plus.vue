@@ -1,38 +1,9 @@
 <template>
   <div id="plus">
-    <div class="up-index" v-show="false">
+    <div class="up-index" v-show="true">
       <a-input placeholder="请输入产品编号" allow-clear class="pu-inp" />
       <a-button html-type="button" :loading="loading" @click="chan">确定</a-button>
     </div>
-    <div class="u-step">
-      <a-steps
-        v-model="current"
-        type="navigation"
-        size="small"
-        :style="stepStyle"
-        @change="changeStep"
-      >
-        <a-step
-          title="step1"
-          status="process"
-          description="This is a description."
-          :disabled='false'
-        />
-        <a-step
-          title="Step 2"
-          status="waitting"
-          description="This is a description."
-          :disabled="false"
-        />
-        <a-step
-          title="Step 3"
-          status="wait"
-          description="This is a description."
-          :disabled="false"
-        />
-      </a-steps>
-    </div>
-    <router-view></router-view>
   </div>
 </template>
 
@@ -50,7 +21,7 @@ export default {
     };
   },
   beforeCreate() {
-    this.$router.push({name: 'stepone'})
+    // this.$router.push({name: 'stepone'})
   },
   methods: {
     chan() {
@@ -58,6 +29,7 @@ export default {
       setTimeout(() => {
         this.loading = false;
         this.$message.success("操作成功!");
+        this.$router.push({name: 'record'})
       }, 2000);
     },
     changeStep(current) {
@@ -87,18 +59,6 @@ export default {
       height: 40px;
       margin-right: 20px;
     }
-  }
-  .u-form {
-    .ant-form-item {
-      display: flex;
-      .ant-input-affix-wrapper {
-      width: 250px;
-    }
-    }
-  }
-  .plus-btn {
-    display: block;
-    margin: 0 auto;
   }
 }
 </style>

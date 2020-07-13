@@ -11,36 +11,46 @@
         class="login-form"
         @submit="handleSubmit"
       >
-        <a-form-item label="用户名" has-feedback validate-status="success">
+        <a-form-item label="用户名" has-feedback :validate-status="vicon" >
           <a-input
             v-decorator="[
               'userName',
               {
-                rules: [{ required: true, message: '请输入用户名' }],
+                rules: [{ required: true, validator: validateUserName }],
               },
             ]"
             placeholder="用户名"
             autocomplete
+            allow-clear
           >
             <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
           </a-input>
         </a-form-item>
-        <a-form-item label="密码" has-feedback validate-status="warning">
+        <a-form-item label="密码" has-feedback :validate-status="picon">
           <a-input-password
             allow-clear
             placeholder="密码"
             v-decorator="[
               'password',
               {
-                rules: [{ required: true, message: '请输入密码' }],
+                rules: [{ required: true, validator: passwordValidate }],
               },
             ]"
             autocomplete
-          />
+          >
+          <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
+          </a-input-password>
         </a-form-item>
         <a-form-item label="验证码">
           <div class="validate">
-            <a-input class="vertify" placeholder="验证码"></a-input>
+            <a-input 
+              class="vertify" 
+              placeholder="验证码"
+              v-decorator="[
+                'vertify',
+                { rules: [{ required: true, validator: vertifyCode }] }
+              ]"
+            />           
             <canvas id="canvas" width="100" height="30"></canvas>
           </div>
         </a-form-item>
@@ -56,7 +66,7 @@
           >
             记住我
           </a-checkbox>
-          <a class="login-form-forgot" href="#">
+          <a class="login-form-forgot" href="#" @click="toHelp">
             忘记密码
           </a>
           <a-button type="primary" html-type="submit" class="login-form-button">
@@ -78,14 +88,17 @@ export default {
   data() {
     return {
       form: this.$form.createForm(this, { name: "log" }),
+      vicon: null,
+      picon: null,
+      vertifycode: []
     };
   },
   mounted() {
+    let _this = this
     $(function() {
-      var show_num = [];
-      draw(show_num);
+      draw(_this.vertifycode);
       $("#canvas").on("click", function() {
-        draw(show_num);
+        draw(_this.vertifycode);
       })
     })
   },
@@ -100,6 +113,32 @@ export default {
     },
     toSign() {
       this.$router.push('/sign')
+    },
+    toHelp() {
+      this.$router.push({ name: 'help' })
+    },
+    validateUserName(rule, value, callback) {
+      if(/^[0-9]{11}$/.test(value)) {
+        this.vicon = 'success'
+        callback()
+      } else {
+        this.vicon = 'warning'
+        callback('请输入合法的用户名')
+      } 
+    },
+    passwordValidate(rule, value, callback) {
+      const pass = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[\W]).{8}$/;
+      if (pass.test(value)) {
+        this.picon = 'success'
+        callback()
+      } else {
+        this.picon = 'warning'
+        callback('密码不合法')
+      }
+    },
+    vertifyCode(rule,value,callback) {
+      if (this.vertifycode.join('') !== value) callback('not right')
+      else callback()
     }
   },
 };
@@ -116,10 +155,9 @@ export default {
       width: 300px;
       height: 30px;
       text-align: center;
-      cursor: pointer;
       margin-top: 20px;
       margin-bottom: 0;
-      &:hover {
+      &:first-child {
         border-bottom: 3px solid #0984e3;
       }
     }
