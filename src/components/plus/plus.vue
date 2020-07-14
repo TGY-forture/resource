@@ -20,9 +20,6 @@ export default {
       }
     };
   },
-  beforeCreate() {
-    // this.$router.push({name: 'stepone'})
-  },
   methods: {
     chan() {
       this.loading = true;
@@ -31,15 +28,6 @@ export default {
         this.$message.success("操作成功!");
         this.$router.push({name: 'record'})
       }, 2000);
-    },
-    changeStep(current) {
-      if (current == 0) {
-        this.$router.push({name: 'stepone'})
-      } else if (current == 1) {
-        this.$router.push({name: 'steptwo'})
-      } else if (current == 2) {
-        this.$router.push({name: 'stepthree'})
-      }
     }
   },
 };

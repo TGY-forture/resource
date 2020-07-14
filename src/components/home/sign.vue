@@ -19,9 +19,9 @@
                   {
                     required: true,
                     message: '请输入你的邮箱!',
-                  }
-                ]
-              }
+                  },
+                ],
+              },
             ]"
           />
         </a-form-item>
@@ -33,23 +33,19 @@
                 rules: [
                   {
                     required: true,
-                    message: '请输入你的密码!'
+                    message: '请输入你的密码!',
                   },
                   {
-                    validator: validateToNextPassword
-                  }
-                ]
-              }
+                    validator: validateToNextPassword,
+                  },
+                ],
+              },
             ]"
             type="password"
             autocomplete
           />
         </a-form-item>
-        <a-form-item
-          v-bind="formItemLayout"
-          label="确认密码"
-          has-feedback
-        >
+        <a-form-item v-bind="formItemLayout" label="确认密码" has-feedback>
           <a-input
             v-decorator="[
               'confirm',
@@ -57,13 +53,13 @@
                 rules: [
                   {
                     required: true,
-                    message: '请确认你的密码!'
+                    message: '请确认你的密码!',
                   },
                   {
-                    validator: compareToFirstPassword
-                  }
-                ]
-              }
+                    validator: compareToFirstPassword,
+                  },
+                ],
+              },
             ]"
             type="password"
             @blur="handleConfirmBlur"
@@ -82,17 +78,17 @@
               'nickname',
               {
                 rules: [
-                  {                    
+                  {
                     required: true,
                     message: '请输入你的昵称!',
-                    whitespace: true                   
+                    whitespace: true,
                   },
                   {
-                      max: 10,
-                      message: '昵称不能超过十个字符'
-                  }
-                ]
-              }
+                    max: 10,
+                    message: '昵称不能超过十个字符',
+                  },
+                ],
+              },
             ]"
           />
         </a-form-item>
@@ -104,14 +100,14 @@
                 rules: [
                   {
                     required: true,
-                    message: '请输入你的电话号码!'
+                    message: '请输入你的电话号码!',
                   },
                   {
                     len: 11,
-                    message: '电话号码为十一位数字'
-                  }
-                ]
-              }
+                    message: '电话号码为十一位数字',
+                  },
+                ],
+              },
             ]"
             style="width: 100%"
           >
@@ -120,12 +116,8 @@
               v-decorator="['prefix', { initialValue: '86' }]"
               style="width: 70px"
             >
-              <a-select-option value="86">
-                +86
-              </a-select-option>
-              <a-select-option value="87">
-                +87
-              </a-select-option>
+              <a-select-option value="86">+86</a-select-option>
+              <a-select-option value="87">+87</a-select-option>
             </a-select>
           </a-input>
         </a-form-item>
@@ -143,25 +135,22 @@
                     rules: [
                       {
                         required: true,
-                        message: '请输入你得到的验证码!',
-                      }
-                    ]
-                  }
+                        message: '请输入你得到的验证码!'
+                      },
+                      {validator: certiftcate}
+                    ],
+                  },
                 ]"
               />
             </a-col>
             <a-col :span="12">
-              <a-button>获取验证码</a-button>
+              <a-button :loading="code ? true : false" @click="getCode">获取验证码</a-button>
             </a-col>
           </a-row>
         </a-form-item>
         <a-form-item class="u-btn">
-          <a-button type="primary" html-type="submit">
-            注册
-          </a-button>
-          <a-button type="primary" html-type="button" class="sign-back" @click="backLog">
-            返回
-          </a-button>
+          <a-button type="primary" html-type="submit">注册</a-button>
+          <a-button type="primary" html-type="button" class="sign-back" @click="backLog">返回</a-button>
         </a-form-item>
       </a-form>
     </section>
@@ -173,43 +162,58 @@ export default {
   name: "Sign",
   data() {
     return {
+      code: "",
       confirmDirty: false,
       formItemLayout: {
         labelCol: {
           xs: { span: 24 },
-          sm: { span: 10 },
+          sm: { span: 10 }
         },
         wrapperCol: {
           xs: { span: 24 },
-          sm: { span: 5 },
-        },
+          sm: { span: 5 }
+        }
       },
       tailFormItemLayout: {
         wrapperCol: {
           xs: {
             span: 24,
-            offset: 0,
+            offset: 0
           },
           sm: {
             span: 16,
-            offset: 8,
+            offset: 8
           }
         }
       }
-    }
+    };
   },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: "register" });
   },
   methods: {
     backLog() {
-      this.$router.push('/log')
+      this.$router.push("/log");
+    },
+    getCode() {
+      this.code = "1234";
+    },
+    certiftcate(rule, value, callback) {
+      if (value === this.code) {
+        callback();
+      } else {
+        callback("");
+      }
     },
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
           console.log("Received values of form: ", values);
+          this.$message.success(
+            "验证码请求成功，请不要离开本页！",
+            3
+          );
         }
       });
     },
@@ -221,26 +225,26 @@ export default {
       // const form = this.form;
       if (value === this.form.getFieldValue("password")) {
         callback();
-      } else if (value === '') {
-        callback('')
+      } else if (value === "") {
+        callback("");
       } else {
-        callback("两次密码不一致!")
+        callback("两次密码不一致!");
       }
     },
     validateToNextPassword(rule, value, callback) {
-      let pass = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[\W]).{8}$/
+      let pass = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[\W]).{8}$/;
       const form = this.form;
       if (value && this.confirmDirty) {
-        form.validateFields(['confirm'], {force: true})
+        form.validateFields(["confirm"], { force: true });
       }
       if (pass.test(value)) {
-        callback()
-      } else if (value == undefined) {
-        callback('');
+        callback();
+      } else if (value === "" || value == undefined) {
+        callback("");
       } else {
-        callback('密码不符合要求')
+        callback("密码不符合要求");
       }
-    }    
+    }
   }
 };
 </script>
@@ -272,7 +276,7 @@ export default {
           margin-left: 20px;
         }
       }
-    }    
+    }
   }
 }
 </style>
