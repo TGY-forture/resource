@@ -3,15 +3,15 @@
     <div id="step" class="slay">
       <div class="nest">
         <a-steps progress-dot :current="2" direction="vertical">
-          <a-step v-for="item in 5" :key="item" title="Finished" description="This is a description.This is a descriptionThis is a descriptionThis is a description.This is a description.This is a description. This is a description." /> 
+          <a-step v-for="item in 5" :key="item" title="老八老八老八老八老八老八老八" description="This is a description.This is a descriptionThis is a descriptionThis is a description.This is a description.This is a description. This is a description." /> 
         </a-steps>
       </div>
     </div>
     <div id="operation" class="slay">
-      <a-button type="primary">
+      <a-button type="primary" @click="showModal">
         增加工序
       </a-button>
-      <a-button>
+      <a-button @click="changeDat">
         修改信息
       </a-button>
       <a-button type="danger">
@@ -21,12 +21,54 @@
         生成二维码
       </a-button>
     </div>
+    <add-item 
+      :visible="visible"
+      ref="additem"
+      @cancel="handleCancel"
+      @create="handleCreate"
+    >
+    </add-item>
   </div>
 </template>
 
 <script>
+import AddItem from './additem'
 export default {
-  name: "Record"
+  name: "Record",
+  data() {
+    return {
+      visible: false
+    }
+  },
+  components: {
+    AddItem
+  },
+  methods: {
+    showModal() {
+      this.visible = true
+    },
+    handleCancel() {
+      let additem = this.$refs.additem
+      additem.form.resetFields()
+      additem.processing = []
+      this.visible = false;
+    },
+    handleCreate() {
+      const form = this.$refs.additem.form;
+      form.validateFields((err, values) => {
+        if (err) {
+          return;
+        }
+        console.log("Received values of form: ", values);
+        form.resetFields();
+        this.$refs.additem.processing = []
+        this.visible = false;
+      })
+    },
+    changeDat() {
+      
+    }
+  }
 };
 </script>
 
