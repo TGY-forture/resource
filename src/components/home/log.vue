@@ -11,12 +11,12 @@
         class="login-form"
         @submit="handleSubmit"
       >
-        <a-form-item label="用户名" has-feedback :validate-status="vicon" >
+        <a-form-item label="用户名" has-feedback :validate-status="vicon">
           <a-input
             v-decorator="[
-              'userName',
+              'username',
               {
-                rules: [{ required: true, validator: validateUserName }],
+                rules: [{ validator: validateUserName }],
               },
             ]"
             placeholder="用户名"
@@ -38,19 +38,19 @@
             ]"
             autocomplete
           >
-          <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
+            <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
           </a-input-password>
         </a-form-item>
         <a-form-item label="验证码">
           <div class="validate">
-            <a-input 
-              class="vertify" 
+            <a-input
+              class="vertify"
               placeholder="验证码"
               v-decorator="[
                 'vertify',
                 { rules: [{ required: true, validator: vertifyCode }] }
               ]"
-            />           
+            />
             <canvas id="canvas" width="100" height="30"></canvas>
           </div>
         </a-form-item>
@@ -63,18 +63,10 @@
                 initialValue: false,
               },
             ]"
-          >
-            记住我
-          </a-checkbox>
-          <a class="login-form-forgot" href="#" @click="toHelp">
-            忘记密码
-          </a>
-          <a-button type="primary" html-type="submit" class="login-form-button">
-            登录
-          </a-button>
-          <a-button class="sign" @click="toSign">
-            前往注册
-          </a-button>
+          >记住我</a-checkbox>
+          <a class="login-form-forgot" href="#" @click="toHelp">忘记密码</a>
+          <a-button type="primary" html-type="submit" class="login-form-button" :loading="loading">登录</a-button>
+          <a-button class="sign" @click="toSign">前往注册</a-button>
         </a-form-item>
       </a-form>
     </section>
@@ -90,57 +82,74 @@ export default {
       form: this.$form.createForm(this, { name: "log" }),
       vicon: null,
       picon: null,
-      vertifycode: []
+      vertifycode: [],
+      loading: false
     };
   },
   mounted() {
-    let _this = this
+    let _this = this;
     $(function() {
       draw(_this.vertifycode);
       $("#canvas").on("click", function() {
         draw(_this.vertifycode);
-      })
-    })
+      });
+    });
   },
   methods: {
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          console.log("Received values of form: ", values);
+          this.loading = true
+          this.$axios.post("/log", values).then(
+            (res) => {
+              this.loading = false
+              if (res.data === 'success') {
+                this.$message.success('登陆成功')
+                this.vicon = this.picon = null
+                this.form.resetFields()
+              } else {
+                this.$message.error('账号或密码错误')
+              }
+            })
+            .catch(
+              (err) => {
+                this.loading = false
+                this.$message.warning('请求超时或服务器故障')
+            });
         }
       });
     },
     toSign() {
-      this.$router.push('/sign')
+      this.$router.push("/sign");
     },
     toHelp() {
-      this.$router.push({ name: 'help' })
+      this.$router.push({ name: "help" });
     },
     validateUserName(rule, value, callback) {
-      if(/^[0-9]{11}$/.test(value)) {
-        this.vicon = 'success'
-        callback()
+      if (/^[0-9]{11}$/.test(value)) {
+        this.vicon = "success";
+        callback();
       } else {
-        this.vicon = 'warning'
-        callback('请输入合法的用户名')
-      } 
+        this.vicon = "warning";
+        callback("请输入合法的用户名");
+      }
     },
     passwordValidate(rule, value, callback) {
       const pass = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[\W]).{8}$/;
       if (pass.test(value)) {
-        this.picon = 'success'
-        callback()
+        this.picon = "success";
+        callback();
       } else {
-        this.picon = 'warning'
-        callback('密码不合法')
+        this.picon = "warning";
+        callback("密码不合法");
       }
     },
-    vertifyCode(rule,value,callback) {
-      if (this.vertifycode.join('') !== value) callback('not right')
-      else callback()
+    vertifyCode(rule, value, callback) {
+      if (this.vertifycode.join("") !== value) callback("Not Right");
+      else callback();
     }
-  },
+  }
 };
 </script>
 
@@ -172,13 +181,14 @@ export default {
     ::v-deep .ant-input {
       width: 300px;
     }
-    .validate {   //在赋予组件id值用作选择器时无效,所以能不能写作#validate
+    .validate {
+      //在赋予组件id值用作选择器时无效,所以能不能写作#validate
       display: flex;
       align-items: center;
       justify-content: space-between;
       .vertify {
         width: 100px;
-      }     
+      }
       #canvas {
         box-sizing: border-box;
         border: 1px solid #ddd;

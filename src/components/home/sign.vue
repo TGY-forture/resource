@@ -144,7 +144,7 @@
               />
             </a-col>
             <a-col :span="12">
-              <a-button :loading="code ? true : false" @click="getCode">获取验证码</a-button>
+              <a-button :loading="loading" @click="getCode">获取验证码</a-button>
             </a-col>
           </a-row>
         </a-form-item>
@@ -162,7 +162,8 @@ export default {
   name: "Sign",
   data() {
     return {
-      code: "",
+      code: '',
+      loading: false,
       confirmDirty: false,
       formItemLayout: {
         labelCol: {
@@ -196,7 +197,21 @@ export default {
       this.$router.push("/log");
     },
     getCode() {
-      this.code = "1234";
+      this.loading = true
+      this.$axios.get('/sign').then(
+        res => {
+          this.loading = false
+          this.code = res.data
+          this.$notification.open({
+            message: `你的验证码为${res.data}`,
+            icon: <a-icon type="smile" style="color: #108ee9" />,
+          });
+        }
+      ).catch(
+        err => {
+          console.log(err)
+        }
+      )
     },
     certiftcate(rule, value, callback) {
       if (value === this.code) {
@@ -209,11 +224,22 @@ export default {
       e.preventDefault();
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
-          console.log("Received values of form: ", values);
-          this.$message.success(
-            "验证码请求成功，请不要离开本页！",
-            3
-          );
+          this.$axios.post('/sign', values).then(
+            res => {
+              if (res.data == 'success') {
+                this.$message.success('注册成功')
+              } else if (res.data == 'same') {
+                this.$message.warning('该用户已注册')
+              }
+            }
+          ).catch(
+            err => {
+              console.log(err)
+            }
+          )
+          // this.form.resetFields()
+        } else {
+          console.log(err)
         }
       });
     },
@@ -222,7 +248,6 @@ export default {
       this.confirmDirty = this.confirmDirty || !!value;
     },
     compareToFirstPassword(rule, value, callback) {
-      // const form = this.form;
       if (value === this.form.getFieldValue("password")) {
         callback();
       } else if (value === "") {
