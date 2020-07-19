@@ -228,18 +228,16 @@ export default {
             res => {
               if (res.data == 'success') {
                 this.$message.success('注册成功')
+                this.form.resetFields()
               } else if (res.data == 'same') {
                 this.$message.warning('该用户已注册')
+              } else if (res.data == false) {
+                this.$message.error('注册失败，服务器故障')
               }
             }
-          ).catch(
-            err => {
-              console.log(err)
-            }
           )
-          // this.form.resetFields()
         } else {
-          console.log(err)
+          return
         }
       });
     },

@@ -108,8 +108,12 @@ export default {
                 this.$message.success('登陆成功')
                 this.vicon = this.picon = null
                 this.form.resetFields()
-              } else {
-                this.$message.error('账号或密码错误')
+              } else if (res.data == 'empty') {
+                this.$message.warning('该用户不存在')
+              } else if (res.data == 'active') {
+                this.$message.warning('该用户已在其它地方登陆')
+              } else if (res.data == false) {
+                this.$message.error('用户名或密码错误')
               }
             })
             .catch(

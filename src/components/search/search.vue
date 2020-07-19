@@ -2,16 +2,16 @@
   <div id="components-form-demo-advanced-search">
     <a-form class="ant-advanced-search-form" :form="form" @submit="handleSearch">
       <a-form-item label="日期">
-        <a-date-picker v-decorator="['dateselect',{rules:[{type: 'object'}]}]" />
+        <a-date-picker v-decorator="['date',{rules:[{type: 'object'}]}]" />
       </a-form-item>
       <a-form-item label="产品编号">
-        <a-input class="pro-num pro" v-decorator="['pronum']"></a-input>
+        <a-input class="pro-num pro" v-decorator="['seq']" allow-clear></a-input>
       </a-form-item>
       <a-form-item label="负责人">
-        <a-input class="pro-man pro" v-decorator="['proman']"></a-input>
+        <a-input class="pro-man pro" v-decorator="['manager']" allow-clear></a-input>
       </a-form-item>
       <a-form-item label="生产批次">
-        <a-input class="pro-cnt pro" v-decorator="['procnt']"></a-input>
+        <a-input class="pro-cnt pro" v-decorator="['batch']" allow-clear></a-input>
       </a-form-item>
       <a-row>
         <a-col :span="24" :style="{ textAlign: 'left' }">
@@ -22,9 +22,9 @@
     </a-form>
     <div class="search-result-list" v-if="reshow">搜索结果</div>
     <div v-else>
-      <a-table :columns="columns" :data-source="data" :pagination="false">
+      <a-table :columns="columns" :data-source="dat" :pagination="false" :row-key="(record) => record.id">
         <template slot="detail" slot-scope="text,record">
-          <a slot="detail" @click="getDat(record)">{{ text }}</a>
+          <a slot="detail" @click="getDat(record)">查看</a>
         </template>  
       </a-table>
     </div>
@@ -38,6 +38,7 @@
       @change="onChange"
       :page-size="7"
     />
+    <a-spin size="large" class="u-spin" :spinning="spinning"></a-spin>
   </div>
 </template>
 
@@ -47,108 +48,39 @@ import moment from "moment";
 const columns = [
   {
     title: "产品名称",
-    dataIndex: "name",
-    key: "name"
+    dataIndex: "name"
   },
   {
     title: "产品编号",
-    dataIndex: "num",
-    key: "num"
+    dataIndex: "seq"
   },
   {
     title: "产品批次",
-    dataIndex: "period",
-    key: "period"
+    dataIndex: "batch"
   },
   {
     title: "出厂日期",
-    dataIndex: "date",
-    key: "date"
+    dataIndex: "date"
   },
   {
     title: "负责人",
-    dataIndex: "powman",
-    key: "powman"
+    dataIndex: "manager"
   },
   {
     title: "详细信息",
     dataIndex: "detail",
-    key: "detail",
     scopedSlots: { customRender: "detail" }
-  }
-];
-const data = [
-  {
-    key: "1",
-    name: "杰克逊饿哦举动深没是大是",
-    num: "12345678",
-    period: "uhsck8746vhd",
-    date: "2019-1-12",
-    powman: "李晓明",
-    detail: "查看"
-  },
-  {
-    key: "2",
-    name: "杰克逊是大是",
-    num: '45678',
-    period: "ck8746vhd",
-    date: "2019d-1-12",
-    powman: "李明",
-    detail: "查看"
-  },
-  {
-    key: "3",
-    name: "杰饿哦举动深没是大是",
-    num: 'ghghgh',
-    period: "u565757",
-    date: "2013-1-12",
-    powman: "晓明",
-    detail: "查看"
-  },
-  {
-    key: "4",
-    name: "杰克逊饿哦举动深没是大是",
-    num: 12345678,
-    period: "uhsck8746vhd",
-    date: "2019-1-12",
-    powman: "李晓明",
-    detail: "查看"
-  },
-  {
-    key: "5",
-    name: "杰克逊饿哦举动深没是大是",
-    num: 12345678,
-    period: "uhsck8746vhd",
-    date: "2019-1-12",
-    powman: "李晓明",
-    detail: "查看"
-  },
-  {
-    key: "6",
-    name: "杰克逊饿哦举动深没是大是",
-    num: 12345678,
-    period: "uhsck8746vhd",
-    date: "2019-1-12",
-    powman: "李晓明",
-    detail: "查看"
-  },
-  {
-    key: "7",
-    name: "杰克逊饿哦举动深没是大是",
-    num: 12345678,
-    period: "uhsck8746vhd",
-    date: "2019-1-12",
-    powman: "李晓明",
-    detail: "查看"
   }
 ];
 export default {
   name: "Search",
   data() {
     return {
-      data,
+      sourcedat: null,
+      dat: null,
       columns,
-      total: 50,
+      total: 0,
+      spinning: false,
       reshow: true,
       form: this.$form.createForm(this, { name: "advanced_search" })
     };
@@ -159,17 +91,45 @@ export default {
     },
     handleSearch(e) {
       e.preventDefault();
-      this.form.validateFields((error, values) => {
-        console.log(values);
-      });
+      const value = this.form.getFieldsValue()
+      for (let key in value) {
+        value[key] ? null : delete(value[key])
+      }
+      if (Object.keys(value).length == 0) return
+      this.spinning = true
+      if (value.date) {
+        value.date = value.date.format('YYYY-MM-DD')
+      }
+      this.$axios.get('/search', {
+        params: value
+      }).then(
+        (res) => {
+          this.spinning = false
+          if (res.data != 'err') {
+            this.reshow = false
+            this.dat = res.data.slice(0, 7)
+            this.sourcedat = res.data
+            this.total = res.data.length
+            // console.log(res.data)
+          } else {
+            throw(new Error('服务器故障'))
+          }
+        }
+      ).catch(
+        (errval) => {
+          this.$message.error(errval.message)
+        }
+      )
     },
     handleReset() {
       this.form.resetFields();
-      this.reshow = !this.reshow;
+      this.dat = null
+      this.total = 0
     },
     moment,
     onChange(pageNumber) {
-      console.log("Page: ", pageNumber);
+      let start = (pageNumber - 1) * 7
+      this.dat = this.sourcedat.slice(start, start + 7)
     }
   }
 };
@@ -210,6 +170,12 @@ export default {
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
+  }
+  .u-spin {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 2;  //在空数据表格上显示加载状态
   }
 }
 </style>
