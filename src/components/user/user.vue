@@ -28,8 +28,8 @@
           </a-radio-group>
         </a-form-item>
       </a-form>
-      <a-button type="primary" disabled>保存</a-button>
-      <a-button type="primary">修改</a-button>
+      <a-button type="primary">保存</a-button>
+      <!-- <a-button type="primary">修改</a-button> -->
     </div>
   </div>
 </template>

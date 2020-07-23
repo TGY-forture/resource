@@ -1,10 +1,13 @@
 <template>
   <div id="record">
     <div id="step" class="slay">
-      <div class="nest">
+      <div class="nest" v-if="emptydata">
         <a-steps progress-dot :current="2" direction="vertical">
           <a-step v-for="item in 5" :key="item" title="老八老八老八老八老八老八老八" description="This is a description.This is a descriptionThis is a descriptionThis is a description.This is a description.This is a description. This is a description." /> 
         </a-steps>
+      </div>
+      <div v-else>
+        <h2  class="empty">暂无记录!</h2>
       </div>
     </div>
     <div id="operation" class="slay">
@@ -31,17 +34,39 @@
   </div>
 </template>
 
-<script>
+<script> 
 import AddItem from './additem'
 export default {
   name: "Record",
   data() {
     return {
-      visible: false
+      emptydata: false,
+      visible: false,
+      state: { //实际来源 Vuex
+        seq: '12345678',
+        tablename: 'ship',
+        totalprocess: 5,
+        company: '能力有限公司'
+      },
+      processlist: '',
+      itemslist: ''
     }
   },
   components: {
     AddItem
+  },
+  //不能使用beforeCreate,data观测和event|watcher尚未配置
+  created() {
+    //该序列号产品至少已经录入了一道工序的情况
+    this.$axios.get('/record', {params: {seq: this.state.seq, tablename: this.state.tablename, totalprocess: this.state.totalprocess, company: this.state.company}}).then(
+      (res) => {
+        console.log(res.data)
+      }
+    ).catch(
+      (err) => {
+        console.error(err)
+      }
+    )
   },
   methods: {
     showModal() {
@@ -66,7 +91,7 @@ export default {
       })
     },
     changeDat() {
-      
+      this.emptydata = !this.emptydata
     }
   }
 };
@@ -119,6 +144,11 @@ export default {
       position: absolute;
       top: 0;
       right: 0;
+    }
+    .empty {
+      font-weight: 600;
+      text-align: center;
+      margin-top: 45%;
     }
   }
   #operation {

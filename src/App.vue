@@ -11,12 +11,42 @@
 import Top from './views/Top'
 import Lside from './views/Lside'
 import Rside from './views/Rside'
+import {docCookies} from './assets/js/cookie'
+
 export default {
   name: 'App',
   components: {
     Top,
     Lside,
     Rside
+  },
+  mounted
+}
+function mounted() {
+  let username = docCookies.getItem('username')
+  let remember = docCookies.getItem('remember')
+  if (username && remember) {
+    //初始化用户数据
+    this.$axios.put('/index', {islog: 'active', username}).then(
+      (res) => {
+        if (res.data === 'ok') {
+          return this.$axios.get('/index', {params: {username}})
+        } else {
+          return Promise.reject('server error')
+        }
+      }
+    ).then(
+      (res) => {
+        if (res.data === 'server error') {
+          this.$message.error('server fail!')
+        } else {
+          this.$store.state.initdat = res.data
+        }
+      }
+    ).catch(
+      err => {
+        console.error(err)
+    })
   }
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div id="components-form-demo-advanced-search">
     <a-form class="ant-advanced-search-form" :form="form" @submit="handleSearch">
-      <a-form-item label="日期">
+      <a-form-item label="出厂日期">
         <a-date-picker v-decorator="['date',{rules:[{type: 'object'}]}]" />
       </a-form-item>
       <a-form-item label="产品编号">

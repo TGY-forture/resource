@@ -60,10 +60,12 @@
               'remember',
               {
                 valuePropName: 'checked',
-                initialValue: false,
+                initialValue: false
               },
             ]"
-          >记住我</a-checkbox>
+          >
+            记住我
+          </a-checkbox>
           <a class="login-form-forgot" href="#" @click="toHelp">忘记密码</a>
           <a-button type="primary" html-type="submit" class="login-form-button" :loading="loading">登录</a-button>
           <a-button class="sign" @click="toSign">前往注册</a-button>
@@ -100,6 +102,7 @@ export default {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
+          this.setcookie(values.remember)
           this.loading = true
           this.$axios.post("/log", values).then(
             (res) => {
@@ -108,11 +111,11 @@ export default {
                 this.$message.success('登陆成功')
                 this.vicon = this.picon = null
                 this.form.resetFields()
-              } else if (res.data == 'empty') {
+              } else if (res.data === 'empty') {
                 this.$message.warning('该用户不存在')
-              } else if (res.data == 'active') {
+              } else if (res.data === 'active') {
                 this.$message.warning('该用户已在其它地方登陆')
-              } else if (res.data == false) {
+              } else if (res.data === 'fail') {
                 this.$message.error('用户名或密码错误')
               }
             })
@@ -152,6 +155,9 @@ export default {
     vertifyCode(rule, value, callback) {
       if (this.vertifycode.join("") !== value) callback("Not Right");
       else callback();
+    },
+    setcookie(val) {
+      document.cookie = val ? "remember=yes" : "remember=no"
     }
   }
 };

@@ -11,7 +11,7 @@
       <a-form-item label="姓名">
         <a-input v-decorator="['username',{rules:[{required: true,message: '请填写姓名'}]}]" />
       </a-form-item>
-      <a-form-item label="职位">
+      <a-form-item label="公司">
         <a-select
           style="width: 200px"
           v-decorator="['usermat',{rules:[{required: true}],initialValue: 'mat'}]"

@@ -231,13 +231,15 @@ export default {
                 this.form.resetFields()
               } else if (res.data == 'same') {
                 this.$message.warning('该用户已注册')
-              } else if (res.data == false) {
+              } else if (res.data === 'fail') {
                 this.$message.error('注册失败，服务器故障')
               }
             }
+          ).catch(
+            err => {
+              console.error(err)
+            }
           )
-        } else {
-          return
         }
       });
     },
