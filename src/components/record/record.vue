@@ -7,7 +7,7 @@
         </a-steps>
       </div>
       <div v-else>
-        <h2  class="empty">暂无记录!</h2>
+        <h2 class="empty">暂无记录!</h2>
       </div>
     </div>
     <div id="operation" class="slay">
@@ -26,15 +26,15 @@
     </div>
     <add-item 
       :visible="visible"
+      :sourcedata="sourcedata"
       ref="additem"
       @cancel="handleCancel"
-      @create="handleCreate"
     >
     </add-item>
   </div>
 </template>
 
-<script> 
+<script>
 import AddItem from './additem'
 export default {
   name: "Record",
@@ -48,8 +48,7 @@ export default {
         totalprocess: 5,
         company: '能力有限公司'
       },
-      processlist: '',
-      itemslist: ''
+      sourcedata: []
     }
   },
   components: {
@@ -60,7 +59,9 @@ export default {
     //该序列号产品至少已经录入了一道工序的情况
     this.$axios.get('/record', {params: {seq: this.state.seq, tablename: this.state.tablename, totalprocess: this.state.totalprocess, company: this.state.company}}).then(
       (res) => {
-        console.log(res.data)
+        if (res.data) {
+          this.sourcedata = res.data
+        }
       }
     ).catch(
       (err) => {
@@ -75,20 +76,8 @@ export default {
     handleCancel() {
       let additem = this.$refs.additem
       additem.form.resetFields()
-      additem.processing = []
+      additem.createdata = []
       this.visible = false;
-    },
-    handleCreate() {
-      const form = this.$refs.additem.form;
-      form.validateFields((err, values) => {
-        if (err) {
-          return;
-        }
-        console.log("Received values of form: ", values);
-        form.resetFields();
-        this.$refs.additem.processing = []
-        this.visible = false;
-      })
     },
     changeDat() {
       this.emptydata = !this.emptydata
