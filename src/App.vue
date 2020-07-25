@@ -26,6 +26,7 @@ function mounted() {
   let username = docCookies.getItem('username')
   let remember = docCookies.getItem('remember')
   if (username && remember) {
+    return
     //初始化用户数据
     this.$axios.put('/index', {islog: 'active', username}).then(
       (res) => {
@@ -40,7 +41,7 @@ function mounted() {
         if (res.data === 'server error') {
           this.$message.error('server fail!')
         } else {
-          this.$store.state.initdat = res.data
+          
         }
       }
     ).catch(

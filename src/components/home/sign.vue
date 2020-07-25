@@ -222,7 +222,7 @@ export default {
     },
     handleSubmit(e) {
       e.preventDefault();
-      this.form.validateFieldsAndScroll((err, values) => {
+      this.form.validateFields((err, values) => {
         if (!err) {
           this.$axios.post('/sign', values).then(
             res => {

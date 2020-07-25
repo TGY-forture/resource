@@ -77,6 +77,7 @@
 
 <script>
 import { draw, randomColor } from "@/assets/js/vertifycode";
+import { mapMutations } from 'vuex'
 export default {
   name: "Log",
   data() {
@@ -102,15 +103,16 @@ export default {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          this.setcookie(values.remember)
+          // this.setcookie(values.remember)
           this.loading = true
           this.$axios.post("/log", values).then(
             (res) => {
               this.loading = false
               if (res.data === 'success') {
-                this.$message.success('登陆成功')
                 this.vicon = this.picon = null
                 this.form.resetFields()
+                this.$message.loading({ content: '登陆成功,正在加载数据......', key: 'loading' })
+                return this.$axios.get('/log', {params: {username: values.username}})
               } else if (res.data === 'empty') {
                 this.$message.warning('该用户不存在')
               } else if (res.data === 'active') {
@@ -118,11 +120,19 @@ export default {
               } else if (res.data === 'fail') {
                 this.$message.error('用户名或密码错误')
               }
-            })
-            .catch(
+            }).then(
+              (res) => {
+                if (res.data !== 'fail') {              
+                  this.$message.success({ content: '数据加载成功', key: 'loading'})
+                  this.initUserinfo(res.data)
+                } else {
+                  this.$message.error({ content: '数据加载失败', key: 'loading'})
+                }
+              }
+            ).catch(
               (err) => {
                 this.loading = false
-                this.$message.warning('请求超时或服务器故障')
+                console.error(err)
             });
         }
       });
@@ -156,9 +166,7 @@ export default {
       if (this.vertifycode.join("") !== value) callback("Not Right");
       else callback();
     },
-    setcookie(val) {
-      document.cookie = val ? "remember=yes" : "remember=no"
-    }
+    ...mapMutations(['initUserinfo'])
   }
 };
 </script>

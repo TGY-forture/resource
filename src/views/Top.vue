@@ -2,15 +2,43 @@
   <div id="top">
     <p>Fantasy Factory</p>
     <a-input-search placeholder="请输入产品编号" enter-button style="width:300px;margin-right:50px" />     
-    <a-avatar size="default" icon="user" />
-    <span class="user">采蘑菇的小菇凉</span>
-    <a-icon type="logout" style="font-size:24px" />
+    <a-avatar size="default" :src="avatar" v-if="true"/>
+    <span class="user">{{'username'}}</span>
+    <a-icon type="logout" style="font-size:24px;cursor:pointer" @click="logout"/>
   </div>
 </template>
 
 <script>
+const avatar = require('../assets/img/bee-5069160_1280.png')
 export default {
-  name: 'Top'
+  name: 'Top',
+  data() {
+    return {
+      avatar
+    }
+  },
+  computed: {
+    username() {
+      return this.$store.state.userinfo.username
+    }
+  },
+  methods: {
+    logout() {
+      this.$axios.put('/log', {username: '18361812729'}).then(
+        res => {
+          if (res.data === 'ok') {
+            this.$message.warning('已下线!')
+          } else {
+            this.$message.warning('操作失败')
+          }
+        }
+      ).catch(
+        err => {
+          console.error(err)
+        }
+      )
+    }
+  }
 }
 </script>
 
