@@ -103,7 +103,6 @@ export default {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          // this.setcookie(values.remember)
           this.loading = true
           this.$axios.post("/log", values).then(
             (res) => {

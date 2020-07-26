@@ -3,7 +3,7 @@
     <p>Fantasy Factory</p>
     <a-input-search placeholder="请输入产品编号" enter-button style="width:300px;margin-right:50px" />     
     <a-avatar size="default" :src="avatar" v-if="true"/>
-    <span class="user">{{'username'}}</span>
+    <span class="user">{{username}}</span>
     <a-icon type="logout" style="font-size:24px;cursor:pointer" @click="logout"/>
   </div>
 </template>
@@ -14,12 +14,15 @@ export default {
   name: 'Top',
   data() {
     return {
-      avatar
+      
     }
   },
   computed: {
     username() {
-      return this.$store.state.userinfo.username
+      return this.$store.state.userinfo.nickname || '未登录'
+    },
+    avatar() {
+      return this.$store.state.avatar
     }
   },
   methods: {

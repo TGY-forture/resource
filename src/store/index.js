@@ -5,8 +5,14 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    initdat: null,
-    userinfo: null
+    userinfo: {
+      nickname: '',
+      age: 18,
+      sex: 'man',
+      username: '',
+      email: ''
+    },
+    avatar: null
   },
   getters: {
     
@@ -14,6 +20,9 @@ export default new Vuex.Store({
   mutations: {
     initUserinfo(state, value) {
       state.userinfo = value
+    },
+    initAvatar(state, bloburl) {
+      state.avatar = bloburl
     }
   },
   actions: {
