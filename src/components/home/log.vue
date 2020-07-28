@@ -66,7 +66,7 @@
           >
             记住我
           </a-checkbox>
-          <a class="login-form-forgot" href="#" @click="toHelp">忘记密码</a>
+          <a class="login-form-forgot" href="javascript:;" @click="toHelp">忘记密码</a>
           <a-button type="primary" html-type="submit" class="login-form-button" :loading="loading">登录</a-button>
           <a-button class="sign" @click="toSign">前往注册</a-button>
         </a-form-item>
@@ -77,7 +77,7 @@
 
 <script>
 import { draw, randomColor } from "@/assets/js/vertifycode";
-import { mapMutations } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 export default {
   name: "Log",
   data() {
@@ -116,16 +116,20 @@ export default {
                 this.$message.warning('该用户不存在')
               } else if (res.data === 'active') {
                 this.$message.warning('该用户已在其它地方登陆')
-              } else if (res.data === 'fail') {
+              } else if (res.data === 'fail'){
                 this.$message.error('用户名或密码错误')
               }
             }).then(
               (res) => {
-                if (res.data !== 'fail') {              
-                  this.$message.success({ content: '数据加载成功', key: 'loading'})
-                  this.initUserinfo(res.data)
-                } else {
-                  this.$message.error({ content: '数据加载失败', key: 'loading'})
+                if (res) {
+                  if (res.data !== 'fail') {              
+                    this.initUserinfo(res.data)
+                    this.getAvatar()
+                    this.getCompanyinfo()
+                    this.$message.success({ content: '数据加载成功', key: 'loading'})
+                  } else {
+                    this.$message.error({ content: '数据加载失败', key: 'loading'})
+                  }
                 }
               }
             ).catch(
@@ -165,7 +169,8 @@ export default {
       if (this.vertifycode.join("") !== value) callback("Not Right");
       else callback();
     },
-    ...mapMutations(['initUserinfo'])
+    ...mapMutations(['initUserinfo']),
+    ...mapActions(['getAvatar', 'getCompanyinfo'])
   }
 };
 </script>
@@ -199,7 +204,6 @@ export default {
       width: 300px;
     }
     .validate {
-      //在赋予组件id值用作选择器时无效,所以能不能写作#validate
       display: flex;
       align-items: center;
       justify-content: space-between;

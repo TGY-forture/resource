@@ -1,53 +1,49 @@
 <template>
   <div id="app">
     <Top class="top" />
-    <Lside class="lside" />   
+    <Lside class="lside" />
     <Rside class="rside">
       <router-view></router-view>
     </Rside>
   </div>
 </template>
 <script>
-import Top from './views/Top'
-import Lside from './views/Lside'
-import Rside from './views/Rside'
-import {docCookies} from './assets/js/cookie'
+import Top from "./views/Top";
+import Lside from "./views/Lside";
+import Rside from "./views/Rside";
+import { docCookies } from "./assets/js/cookie";
+import { mapMutations, mapActions } from "vuex";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     Top,
     Lside,
-    Rside
+    Rside,
   },
-  mounted
-}
+  mounted,
+  methods: {
+    ...mapMutations(["initUserinfo"]),
+    ...mapActions(["getAvatar", "getCompanyinfo"]),
+  },
+};
 function mounted() {
-  let username = docCookies.getItem('username')
-  let remember = docCookies.getItem('remember')
-  if (username && remember) {
-    return
+  //用户点击浏览器刷新按钮时重新加载数据到vuex
+  let username = docCookies.getItem("username");
+  if (username) {
     //初始化用户数据
-    this.$axios.put('/index', {islog: 'active', username}).then(
-      (res) => {
-        if (res.data === 'ok') {
-          return this.$axios.get('/index', {params: {username}})
-        } else {
-          return Promise.reject('server error')
+    this.$axios
+      .get("/log", { params: { username } })
+      .then((res) => {
+        if (res.data !== "fail") {
+          this.initUserinfo(res.data);
+          this.getAvatar();
+          this.getCompanyinfo();
         }
-      }
-    ).then(
-      (res) => {
-        if (res.data === 'server error') {
-          this.$message.error('server fail!')
-        } else {
-          
-        }
-      }
-    ).catch(
-      err => {
-        console.error(err)
-    })
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 }
 </script>

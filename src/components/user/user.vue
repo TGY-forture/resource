@@ -2,14 +2,14 @@
   <div id="u-user">
     <div class="user-head">
       <div class="photo">
-        <a-avatar :size="200" :src="src"/>
+        <a-avatar :size="200" :src="avatar"/>
         <a-upload
           name="avatar"
           action="http://localhost:3000/user"
           @change="handleChange"
           list-type="picture"
           accept="image/*"
-          :data="user"
+          :data="username"
         >
           <a-button style="margin-left: 20px">
             <a-icon type="upload" />上传头像
@@ -20,7 +20,7 @@
     <div class="user-body">
       <a-form :form="form" @submit="saveInfo">
         <a-form-item label="用户名" >
-          <a-input v-decorator="['username']"></a-input>
+          <a-input v-decorator="['username']" disabled></a-input>
         </a-form-item>
         <a-form-item label="邮箱">
           <a-input v-decorator="['email']"></a-input>
@@ -29,7 +29,7 @@
           <a-input v-decorator="['nickname']"></a-input>
         </a-form-item>
         <a-form-item label="年龄">
-          <a-input-number v-decorator="['age']" id="inputNumber" :min="18" :max="50" />
+          <a-input-number v-decorator="['age']" id="inputNumber" :min="18" :max="100" />
         </a-form-item>
         <a-form-item label="性别">
           <a-radio-group v-decorator="['sex', {initialValue: 'man'}]">
@@ -46,47 +46,43 @@
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+
+import {mapMutations, mapState, mapGetters, mapActions} from 'vuex'
 export default {
   name: "User",
-  data() {
-    return {
-      user: {
-        username: '18361812729'
-      }
-    };
-  },
-  computed: {
-    src() {
-      return this.$store.state.avatar
-    }
-  },
   created() {
     this.form = this.$form.createForm(this, ["user_info"]);
+  },
+  computed: {
+    ...mapState(['avatar', 'userinfo']),
+    ...mapGetters(['username', 'commonuser'])
   },
   methods: {
     saveInfo(e) {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          console.log(values)
+          this.$axios.put('/user', values).then(
+            (res) => {
+              if (res.data === 'ok') {
+                this.$message.success('保存成功')
+                this.resetUserinfo(values)
+              } else if (res.data === 'fail') {
+                this.$message.error('保存失败')
+              }
+            }
+          ).catch(
+            (err) => {
+              console.error(err)
+            }
+          )
         }
       })
     },
     handleChange({ file, fileList, event }) {
       if (file.status === "done" && file.response === 'ok') {
         this.$message.success(`${file.name}上传成功`);
-        this.$axios.get("/user", {
-          params: { username: "18361812729" },
-          responseType: "blob"
-        })
-        .then((res) => {
-          let url = window.URL.createObjectURL(res.data);
-          this.initAvatar(url)
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+        this.getAvatar()
         if (fileList.length > 1) {
             fileList.shift()
         }
@@ -94,10 +90,11 @@ export default {
         this.$message.error(`${file.name}上传失败`);
       }
     },
-    ...mapMutations(['initAvatar'])
+    ...mapMutations(['resetUserinfo']),
+    ...mapActions(['getAvatar'])
   },
-  mounted() {    
-    this.form.setFieldsValue(this.$store.state.userinfo);
+  mounted() { 
+    this.form.setFieldsValue(this.userinfo);
   }
 };
 // 辅助转换函数

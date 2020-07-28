@@ -7,22 +7,30 @@
     @cancel="() => { $emit('cancel') }"
     @ok="() => { $emit('create') }"
   >
-    <a-form layout="vertical" :form="form">
+    <a-form
+      :form="form"
+      :label-col="{ span: 8 }"
+      :wrapper-col="{ span: 12 }"
+    >
       <a-form-item label="姓名">
-        <a-input v-decorator="['username',{rules:[{required: true,message: '请填写姓名'}]}]" />
+        <a-input
+          v-decorator="['name', { rules: [{ required: true, message: '请输入姓名' }] }]"
+        />
       </a-form-item>
-      <a-form-item label="公司">
+      <a-form-item label="请选择公司">
         <a-select
-          style="width: 200px"
-          v-decorator="['usermat',{rules:[{required: true}],initialValue: 'mat'}]"
+          v-decorator="[
+          'company',
+          { rules: [{ required: true, message: '请选择公司' }] }
+        ]"
         >
-          <a-select-option value="mat">材料负责人</a-select-option>
-          <a-select-option value="process">加工负责人</a-select-option>
-          <a-select-option value="quality">质检责任人</a-select-option>
+          <a-select-option v-for="(item, index) in company" :key="index" :value="item.company">
+            {{item.company}}
+          </a-select-option>
         </a-select>
       </a-form-item>
-      <a-form-item label="员工认证码">
-        <a-input v-decorator="['usercode',{rules:[{required: true,message: '请填写员工码'}]}]" />
+      <a-form-item label="员工码">
+        <a-input v-decorator="['workcode', { rules: [{ required: true, message: '请输入员工号' }] }]"></a-input>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -31,8 +39,26 @@
 export default {
   name: "CollectionCreateForm",
   props: ["visible"],
+  data() {
+    return {
+      company: null
+    };
+  },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: "form_in_modal" });
+  },
+  created() {
+    this.$axios.get('/addinfo').then(
+      (res) => {
+        if (res.data !== 'fail') {
+          this.company = res.data
+        }
+      }
+    ).catch(
+      (err) => {
+        console.error(err)
+      }
+    )
   }
 };
 </script>

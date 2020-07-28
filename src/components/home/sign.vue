@@ -117,7 +117,6 @@
               style="width: 70px"
             >
               <a-select-option value="86">+86</a-select-option>
-              <a-select-option value="87">+87</a-select-option>
             </a-select>
           </a-input>
         </a-form-item>
@@ -135,9 +134,9 @@
                     rules: [
                       {
                         required: true,
-                        message: '请输入你得到的验证码!'
+                        message: '请输入你得到的验证码!',
                       },
-                      {validator: certiftcate}
+                      { validator: certiftcate },
                     ],
                   },
                 ]"
@@ -162,31 +161,19 @@ export default {
   name: "Sign",
   data() {
     return {
-      code: '',
+      code: "",
       loading: false,
       confirmDirty: false,
       formItemLayout: {
         labelCol: {
           xs: { span: 24 },
-          sm: { span: 10 }
+          sm: { span: 10 },
         },
         wrapperCol: {
           xs: { span: 24 },
-          sm: { span: 5 }
-        }
+          sm: { span: 5 },
+        },
       },
-      tailFormItemLayout: {
-        wrapperCol: {
-          xs: {
-            span: 24,
-            offset: 0
-          },
-          sm: {
-            span: 16,
-            offset: 8
-          }
-        }
-      }
     };
   },
   beforeCreate() {
@@ -197,21 +184,20 @@ export default {
       this.$router.push("/log");
     },
     getCode() {
-      this.loading = true
-      this.$axios.get('/sign').then(
-        res => {
-          this.loading = false
-          this.code = res.data
+      this.loading = true;
+      this.$axios
+        .get("/sign")
+        .then((res) => {
+          this.loading = false;
+          this.code = res.data;
           this.$notification.open({
             message: `你的验证码为${res.data}`,
             icon: <a-icon type="smile" style="color: #108ee9" />,
           });
-        }
-      ).catch(
-        err => {
-          console.log(err)
-        }
-      )
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     },
     certiftcate(rule, value, callback) {
       if (value === this.code) {
@@ -224,22 +210,21 @@ export default {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          this.$axios.post('/sign', values).then(
-            res => {
-              if (res.data == 'success') {
-                this.$message.success('注册成功')
-                this.form.resetFields()
-              } else if (res.data == 'same') {
-                this.$message.warning('该用户已注册')
-              } else if (res.data === 'fail') {
-                this.$message.error('注册失败，服务器故障')
+          this.$axios
+            .post("/sign", values)
+            .then((res) => {
+              if (res.data === "success") {
+                this.$message.success("注册成功");
+                this.form.resetFields();
+              } else if (res.data === "same") {
+                this.$message.warning("该用户已注册");
+              } else if (res.data === "fail") {
+                this.$message.error("注册失败");
               }
-            }
-          ).catch(
-            err => {
-              console.error(err)
-            }
-          )
+            })
+            .catch((err) => {
+              console.error(err);
+            });
         }
       });
     },
@@ -269,8 +254,8 @@ export default {
       } else {
         callback("密码不符合要求");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

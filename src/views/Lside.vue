@@ -32,7 +32,7 @@ let icon = [
   },
   {
     type: 'safety-certificate',
-    name: '权限管理',
+    name: '权限查看',
     path: 'safety-certificate'
   },
   {
