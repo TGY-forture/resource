@@ -28,20 +28,19 @@ export default {
   },
 };
 function mounted() {
-  //用户点击浏览器刷新按钮时重新加载数据到vuex
+  //用户已经登录时点击浏览器刷新按钮时重新加载数据到vuex
   let username = docCookies.getItem("username");
   if (username) {
     //初始化用户数据
-    this.$axios
-      .get("/log", { params: { username } })
-      .then((res) => {
+    this.$axios.get("/log", { params: { username } }).then(
+      (res) => {
         if (res.data !== "fail") {
           this.initUserinfo(res.data);
           this.getAvatar();
           this.getCompanyinfo();
         }
-      })
-      .catch((err) => {
+      }).catch(
+        (err) => {
         console.error(err);
       });
   }

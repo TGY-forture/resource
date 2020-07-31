@@ -5,7 +5,7 @@
     </div>
     <div v-if="stranger" class="stranger">
       <p style="margin:20px 0">你只具有查询信息的权限</p>
-      <a-button type="primary" @click="showModal">更改权限</a-button>
+      <a-button type="primary" :disabled="disabled" @click="showModal">更改权限</a-button>
     </div>
     <div class="worker" v-else>
       <a-row>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations, mapActions, mapState} from 'vuex'
+import {mapGetters, mapActions, mapMutations} from 'vuex'
 import CollectionCreateForm from "./CollectionCreateForm";
 export default {
   name: "SafetyCertificate",
@@ -38,8 +38,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['commonuser', 'company', 'name']),
-    ...mapState(['stranger'])
+    ...mapGetters(['commonuser', 'company', 'name', 'stranger']),
+    disabled() {
+      return this.$store.state.copyinfo.islog === 'active' ? false : true
+    }
   },
   methods: {
     showModal() {
@@ -59,14 +61,20 @@ export default {
                 this.$message.info('认证成功')
                 form.resetFields();
                 this.visible = false;
-                this.getCompanyinfo();
-                // this.changeName(values.name)
+                //认证成功后重新获取员工数据
+                return this.$axios.get('/addinfo/part', {params: {username: this.commonuser}})
               } else if (res.data === 'fail') {
                 this.$message.error('认证失败')
               }
             }
+          ).then(
+            (res) => {
+              if (res && res.data !== 'fail') {
+                this.addInfo(res.data);
+              }
+            }
           ).catch(
-            err => {
+            (err) => {
               console.error(err)
             }
           )
@@ -74,7 +82,7 @@ export default {
       });
     },
     ...mapActions(['getCompanyinfo']),
-    ...mapMutations(['changeName'])
+    ...mapMutations(['addInfo'])
   },
 };
 </script>

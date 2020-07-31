@@ -7,17 +7,17 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     userinfo: {
-      nickname: 'hello world',
+      nickname: 'Hello',
       age: 18,
       sex: 'woman',
       username: '',
       email: ''
     },
     companyinfo: {},
-    copyinfo: null,
-    avatar: '',
-    stranger: true,
-    name: null
+    copyinfo: {
+      company: ''
+    },
+    avatar: ''
   },
   getters: {
     nickname(state) {
@@ -30,10 +30,16 @@ export default new Vuex.Store({
       return state.userinfo.username
     },
     company(state) {
-      return state.companyinfo.company
+      return state.copyinfo.company
     },
     name(state) {
       return state.copyinfo.name
+    },
+    stranger(state) {
+      return state.copyinfo.company == '' ? true : false
+    },
+    companyinfo(state) {
+      return state.companyinfo
     }
   },
   mutations: {
@@ -51,18 +57,21 @@ export default new Vuex.Store({
     },
     initCompanyinfo(state, value) {
       state.companyinfo = value.data
-      state.stranger = false
     },
     resetRootinfo() {
       let sourcedata = {
-        userinfo: {nickname: 'hello world',age: 18,sex: 'woman',username: '',email: ''},
-        company: {},
-        copyinfo: {},
-        avatar: '',
-        stranger: true,
-        name: null
+        userinfo: {nickname: 'Hello',age: 18,sex: 'woman',username: '',email: ''},
+        companyinfo: {},
+        copyinfo: {
+          company: ''
+        },
+        avatar: ''
       }
       this.replaceState(sourcedata)
+    },
+    addInfo(state, data) {
+      state.copyinfo.name = data.name 
+      state.copyinfo.company = data.company 
     }
   },
   actions: {
@@ -80,19 +89,12 @@ export default new Vuex.Store({
         }
       )
     },
-    getCompanyinfo({commit, state}) { //待改写
-      console.log(state.copyinfo.company)
+    getCompanyinfo({commit, state}) {
+      if (!state.copyinfo.company) return  //用户未完成员工认证则不获取工厂数据
       axios.get('/addinfo/all', {params: {company: state.copyinfo.company}}).then(
-        res => {
-          if (res.data !== 'fail') { 
-            commit({type: 'initCompanyinfo', data: res.data})
-            return axios.get('/log')
-          }
-        }
-      ).then(
         (res) => {
-          if (res && res.data !== 'fail') {
-            commit('initUserinfo', res.data)
+          if (res.data !== 'fail') {
+            commit({type: 'initCompanyinfo', data: res.data})
           }
         }
       ).catch(
@@ -103,7 +105,48 @@ export default new Vuex.Store({
     }
   },
   modules: {
+    product: {
+      namespaced: true,
+      state: () => ({
+        proinfo: {},
+        fields: {},
+        fieldsvalue: {},
+        steps: []
+      }),
+      getters: {
 
+      },
+      mutations: {
+        injectdata(state, value) {      //模块中接收 mutations 的 state 为局部的 state
+          state.proinfo = value[0][0]  //每道工序名称
+            let items = value[0][1]      //每道工序所需添加信息对应的字段名
+            for(let key in items) {         //将字段名拆分为数组
+              items[key] = items[key].split('&')
+            }
+            state.fields = items;
+            state.fieldsvalue = value[1]
+        }
+      },
+      actions: {
+        getProinfo({rootGetters, commit}) {
+          axios.get("/record", {
+            params: {
+              tablename: rootGetters.companyinfo.tablename,
+              totalprocess: rootGetters.companyinfo.totalprocess,
+              company: rootGetters.companyinfo.company,
+            }
+          })
+          .then((res) => {
+            if (res.data) {
+              commit('injectdata', res.data)
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+        }
+      }
+    }
   },
   strict: process.env.NODE_ENV !== 'production'
 })

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import {docCookies} from '../assets/js/cookie'
 import {message} from 'ant-design-vue'
+import store from '../store/index'
 
 const home = () => import('../components/home/home.vue')
 const search = () => import('../components/search/search.vue')
@@ -13,18 +14,26 @@ VueRouter.prototype.push = function push(location) {
    return originalPush.call(this, location).catch(err => err)
 }
 
-function beforeEnter(to, from, next) {
-  const username = docCookies.getItem('username') 
-  if (username) {
+function beforeEnter(to, from, next) {  //注意跳转逻辑，防止递归跳转，-_-
+  const username = docCookies.getItem('username')
+  if (!from.name) { //通过浏览器URL访问时，直接回到首页
+    next('/home');
+    return
+  }
+  let toroute = to.name
+  if (username && store.getters.stranger === false) {
     next()
-  } else {
+  } else if (!username) {
     message.warning('请先去登录')
-    if (to.name === 'record') {
-      next('/home')
+    next(false)
+  } else {
+    if (toroute === 'user') {
+      next()
     } else {
+      message.warning('请完成员工认证')
       next(false)
-    } 
-  } 
+    }
+  }
 }
 
 const routes = [
@@ -73,7 +82,6 @@ const routes = [
   {
     path: '/safety-certificate',
     name: 'safety-certificate',
-    beforeEnter,
     component: () => import('../components/safety-certificate/safety-certificate.vue')
   },
   {

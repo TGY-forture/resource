@@ -78,6 +78,7 @@
 <script>
 import { draw, randomColor } from "@/assets/js/vertifycode";
 import { mapMutations, mapActions } from 'vuex'
+import {docCookies} from '@/assets/js/cookie'
 export default {
   name: "Log",
   data() {
@@ -101,6 +102,7 @@ export default {
   methods: {
     handleSubmit(e) {
       e.preventDefault();
+      let preuser = docCookies.getItem('username')
       this.form.validateFields((err, values) => {
         if (!err) {
           this.loading = true
@@ -112,6 +114,7 @@ export default {
                 this.form.resetFields()
                 this.$message.loading({ content: '登陆成功,正在加载数据......', key: 'loading' })
                 return this.$axios.get('/log', {params: {username: values.username}})
+                //已取得用户全部数据
               } else if (res.data === 'empty') {
                 this.$message.warning('该用户不存在')
               } else if (res.data === 'active') {
@@ -123,10 +126,13 @@ export default {
               (res) => {
                 if (res) {
                   if (res.data !== 'fail') {              
-                    this.initUserinfo(res.data)
-                    this.getAvatar()
-                    this.getCompanyinfo()
+                    this.initUserinfo(res.data) //初始化用户数据到vuex
+                    this.getAvatar()   //获取用户头像
+                    this.getCompanyinfo() //得到用户公司数据
                     this.$message.success({ content: '数据加载成功', key: 'loading'})
+                    if (preuser) { //将已经登录的不同用户下线
+                      this.$axios.put('/log', {preuser, username: values.username})
+                    }
                   } else {
                     this.$message.error({ content: '数据加载失败', key: 'loading'})
                   }

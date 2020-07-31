@@ -2,7 +2,7 @@
   <div id="top">
     <p>Fantasy Factory</p>
     <a-input-search placeholder="请输入产品编号" enter-button style="width:300px;margin-right:50px" />     
-    <a-avatar size="default" :src="avatar"/>
+    <a-avatar size="default" :src="avatar" style="cursor:pointer"/>
     <span class="user">{{nickname}}</span>
     <a-icon type="logout" style="font-size:24px;cursor:pointer" @click="logout"/>
   </div>
@@ -19,11 +19,14 @@ export default {
   methods: {
     ...mapMutations(['resetRootinfo']),
     logout() {
-      if (this.commonuser == '') return
+      if (this.commonuser === '') return
       this.$axios.put('/log', {username: this.commonuser}).then(
         res => {
           if (res.data === 'ok') {
             this.$message.warning('已下线!')
+            if (this.$route.name !== 'home') {
+              this.$router.push('/home')
+            }
             this.resetRootinfo()
           } else {
             this.$message.warning('操作失败')

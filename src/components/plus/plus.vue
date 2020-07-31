@@ -17,41 +17,33 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
-  name: "plus",
+  name: "Plus",
   data() {
     return {
-      state: null, //用vuex.state代替
       seq: '',
       pop: false,
       loading: false,
     };
   },
-  created() {
-    this.$axios.get('/plus', {params: {company: '能力有限公司'}}).then(
-      res => {
-        if (res.data !== 'fail') {
-          this.state = res.data[0]
-        }
-      }
-    ).catch(
-      err => {
-        console.log(err)
-      }
-    )
+  computed: {
+    ...mapGetters(['companyinfo']),
+    regseq() {
+      return RegExp(this.companyinfo.seq)
+    }
   },
   methods: {
     getFirstDat() {
-      const regseq = new RegExp(this.state.seq)
-      if (!regseq.test(this.seq)) return
+      if (!this.regseq.test(this.seq)) return
       this.loading = true;
-      this.$axios.get('/plus/getdata', {params: { seq: this.seq, tablename: this.state.tablename }}).then(
+      this.$axios.get('/plus', {params: { seq: this.seq, tablename: this.companyinfo.tablename }}).then(
         res => {
           this.loading = false;
           if (res.data === 'empty') {
             this.pop = true
           } else if (res.data === 'exist') {
-            this.$router.push({name: 'record'})
+            this.$router.push({name: 'record', params: {exist: true}, query: {seq: this.seq}})
           }
         }
       ).catch(
@@ -63,7 +55,7 @@ export default {
     confirm() {
       this.pop = false;
       this.$nextTick(() => {
-        this.$router.push('/record')
+        this.$router.push({name: 'record', params: {exist:false}, query: {seq: this.seq}})
       })
     }
   },
