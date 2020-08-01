@@ -21,62 +21,45 @@
       </div>
     </div>
     <div id="operation" class="slay">
-      <a-button type="primary" @click="showModal" :disabled="steps.length === 5 ? true : false">增加工序</a-button>
-      <a-button type="default" @click="changeDat" :diabled="steps.length > 0 ? false : true">修改信息</a-button>
-      <a-tooltip placement="top">
-        <template slot="title">
-          <span>只能删除最新记录</span>
-        </template>
-        <a-button type="danger" @click="showDeleteConfirm" :diabled="steps.length > 0 ? false : true">删除记录</a-button>
-      </a-tooltip>
-      <a-button type="dashed" :disabled="steps.length === 5 ? false : true">生成二维码</a-button>
+      <a-button type="primary" @click="showModal('add')" :disabled="disabled">增加工序</a-button>
+      <a-button type="default" @click="showModal('change')" :disabled="steps.length > 0 ? false : true">修改信息</a-button>
+      <a-button type="danger" @click="showDeleteConfirm" :diabled="steps.length > 0 ? false : true">删除记录</a-button>
+      <a-button type="dashed" @click="createQrcode" :disabled="!disabled">生成二维码</a-button>
     </div>
     <add-item 
-      :visible="visible" 
-      v-bind="propobj" 
+      :visible="visible"
+      :action="action" 
       ref="additem" 
       v-on="{cancel: handleCancel, refresh: getFlashValue}"
+      :proinfo="processprop"
     >
     </add-item>
-    <change-item 
-      :show="show" ref="changeitem"
-      @cancel="cancelChange"
-      @refresh="getFlashValue"
-      v-bind="propobj"
-    >
-    </change-item>
   </div>
 </template>
 
 <script>
 import AddItem from "./additem";
-import ChangeItem from "./changeitem"
-import { mapGetters, mapActions, mapMutations } from "vuex";
+import QRCode from 'qrcode'
+import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
 export default {
   name: "Record",
   data() {
     return {
       visible: false,
       show: false,
-      proinfo: {},   //工序名称
-      fields: {},    //工序对应字段名
-      fieldsvalue: {},  //字段对应值
-      steps: []        //步骤信息
+      processprop: {},
+      action: '',
+      src: null
     };
   },
   components: {
     AddItem,
-    ChangeItem
   },
   computed: {
     ...mapGetters(["companyinfo"]),
-    propobj() {
-      return {
-        proinfo: this.proinfo,
-        fields: this.fields,
-        fieldsvalue: this.fieldsvalue,
-        steps: this.steps
-      }
+    ...mapState('product', ['proinfo', 'fields', 'fieldsvalue', 'steps']),
+    disabled() {
+      return Object.keys(this.makeHaveData()).length === this.companyinfo.totalprocess
     }
   },
   beforeRouteEnter(to, from, next) { //新增情况
@@ -104,7 +87,7 @@ export default {
   },
   mounted() {
     if (this.$route.params.exist === true) {
-      this.getFlashValue()
+      this.getFlashValue(this.$route.query.seq)
     }
   },
   //不使用beforeCreate,data观测和event|watcher尚未配置
@@ -112,82 +95,48 @@ export default {
     this.getProinfo()
   },
   methods: {
-    // ...mapMutations('product', ['injectdata']),
-    ...mapActions('product', ['getProinfo']),
-    showModal() {
-      this.visible = true;
+    ...mapActions('product', ['getProinfo', 'getFlashValue']),
+    makeHaveData() {
+      let readydata = {}
+      this.steps.map((value) => {     //根据记录生成已经操作过的工序
+        return value.process
+      }).forEach((value, index, arr) => {
+        if (arr.indexOf(value) === index) {
+          readydata[value] = this.proinfo[value]
+        }
+      })
+      return readydata
     },
-    changeDat() {
-      this.show = true
+    showModal(val) {
+      this.action = val
+      if (val === 'add') {
+        this.processprop = this.proinfo
+      } else if (val === 'change') {
+        this.processprop = this.makeHaveData()
+      }
+      this.visible = true;
     },
     handleCancel() {
       let additem = this.$refs.additem;
       additem.form.resetFields();
-      additem.partfields = null;
+      additem.partfields = {};
       this.visible = false;
-    },
-    cancelChange() {
-      let changeitem = this.$refs.changeitem;
-      changeitem.form.resetFields();
-      changeitem.havelist = null;
-      this.show = false
-    },
-    getFlashValue() {
-      this.$axios.get('/record/data', {params: {seq: this.$route.query.seq, company: this.$store.state.copyinfo.company}}).then(
-        (res) => {
-          if (res.data !== 'fail') {
-            this.steps = res.data.sort((previous, after) => {
-              if (previous.id < after.id) {
-                return -1
-              } else if (previous.id > after.id) {
-                return 1
-              } else {
-                return 0
-              }
-            })
-          }
-        }
-      ).catch(
-        (err) => {
-          console.error(err)
-        }
-      )
     },
     icon(action) {
       let icon;
       switch(action) {
         case 'add': icon = 'file-add'; break
-        case 'edit': icon = 'edit'; break
-        case 'delete': icon = 'delete'; break 
-        case 'create': icon = 'check'; break 
+        case 'change': icon = 'edit'; break
         default: break 
       }
       return icon
     },
     onOk() {
-      let stateval = {
-        table: this.$store.state.companyinfo.tablename,
-        seq: this.$route.query.seq,
-        name: this.$store.state.copyinfo.name,
-        action: 'delete',
-        date: new Date().toLocaleDateString(),
-        company: this.$store.state.copyinfo.company
-      }
-      let last = this.steps[this.steps.length - 1] //获得最后一个元素
-      let process = last.process;
-      let values = {};
-      for (let val of this.fields[process]) {
-        values[val] = ''
-      }
-      values['process'] = process
-      this.$axios.post('/record/add', {
-        values,
-        stateval
-      }).then(
+      this.$axios.delete('/record', {params: {company: this.companyinfo.company}}).then(
         res => {
           if (res.data === 'ok') {
-            this.$message.info('信息已删除')
-            this.getFlashValue()
+            this.$message.info('操作成功')
+            this.getFlashValue(this.$route.query.seq)
           } else if (res.data === 'fail') {
             this.$message.error('操作失败')
           }
@@ -200,13 +149,56 @@ export default {
     },
     showDeleteConfirm() {
       this.$confirm({
-        title: '你确定要删除最新的记录吗?',
+        title: '你确定要删除吗?',
+        content: '此操作会删除最新的工序记录，对于已经添加的数据，请选择修改！',
         okText: 'Yes',
         okType: 'danger',
         cancelText: 'No',
         onOk: this.onOk
       });
-    }
+    },
+    createQrcode() { 
+      let seq = this.$route.query.seq
+      QRCode.toDataURL(`http://localhost:8081/search?seq=${seq}`, {width: 200}).then(
+        url => {
+          this.src = url
+          this.$confirm({
+            title: 'success!',
+            icon: function () { 
+              return (<a-icon type="check-circle" theme="twoTone" two-tone-color="#52c41a"></a-icon>)
+            },
+            okText: '下载',
+            cancelText: '关闭',
+            content: (  // JSX support ,vue/cli当前已默认安装插件
+              <div>
+                <img src={url}/>
+              </div>
+            ),
+            onOk: this.downloadImage,
+            destroyOnClose: true
+          });
+        }).catch(
+          err => {
+            console.error(err)
+        })
+    },
+    downloadImage() { 
+      if (window.navigator.msSaveOrOpenBlob) {
+        let bstr = atob(this.src.split(',')[1])
+        let n = bstr.length
+        let u8arr = new Uint8Array(n)
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n)
+        }
+        var blob = new Blob([u8arr])
+        window.navigator.msSaveOrOpenBlob(blob, 'QRCode.png')
+      } else {
+        var tag = document.createElement('a');
+        tag.href = this.src;
+        tag.download = 'QRCode.png'
+        tag.click()
+      }
+    },
   }
 };
 </script>

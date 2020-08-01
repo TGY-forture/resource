@@ -108,10 +108,10 @@ export default new Vuex.Store({
     product: {
       namespaced: true,
       state: () => ({
-        proinfo: {},
-        fields: {},
-        fieldsvalue: {},
-        steps: []
+        proinfo: {},      //工序名称
+        fields: {},       //工序对应字段名
+        fieldsvalue: {},  //字段对应值
+        steps: []         //步骤信息
       }),
       getters: {
 
@@ -125,6 +125,17 @@ export default new Vuex.Store({
             }
             state.fields = items;
             state.fieldsvalue = value[1]
+        },
+        flashsteps(state, data) {
+          state.steps = data.sort((previous, after) => {
+            if (previous.id < after.id) {
+              return -1
+            } else if (previous.id > after.id) {
+              return 1
+            } else {
+              return 0
+            }
+          })
         }
       },
       actions: {
@@ -144,6 +155,30 @@ export default new Vuex.Store({
           .catch((err) => {
             console.error(err);
           });
+        },
+        getFlashValue({commit, rootGetters}, seq) {
+          axios.get('/record/data', {params: {seq, company: rootGetters.company}}).then(
+            (res) => {
+              if (res.data !== 'fail') {
+                commit('flashsteps', res.data)
+              }
+            }
+          ).catch(
+            (err) => {
+              console.error(err)
+            }
+          )
+        },
+        dataCRUD({rootState, rootGetters}, additional) {
+          let stateval = {
+            table: rootState.companyinfo.tablename,
+            seq: additional.seq,
+            name: rootGetters.name,
+            action: additional.action,
+            date: new Date().toLocaleDateString(),
+            company: rootGetters.company
+          }
+          return axios.post('/record',{values: additional.values, stateval})
         }
       }
     }

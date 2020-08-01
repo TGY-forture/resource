@@ -9,9 +9,8 @@
       <a-form-item label="请选择工序名称">
         <a-select
           mode="default"
-          style="width: 100%"
+          style="width: 70%"
           show-arrow
-          label-in-value
           v-decorator="[
             'process',
             {rules: [{required: true, message: '工序不能为空'}]}
@@ -24,7 +23,7 @@
         </a-select>
       </a-form-item> 
       <a-form-item v-for="(val, key) in partfields" :key="key" :label="val">
-        <a-input style="width: 100%" v-decorator="[key, {rules: [{required: true, message: '值不能为空'}]}]"></a-input>
+        <a-input style="width: 70%" v-decorator="[key, {rules: [{required: true, message: '值不能为空'}]}]"></a-input>
       </a-form-item>
       <a-form-item class="pos-btn">
         <a-button type="primary" html-type="submit">
@@ -35,27 +34,9 @@
   </a-modal>
 </template>
 <script>
+import {mapState, mapActions} from 'vuex'
 export default {
   name: "AddItem",
-  props: {
-    visible: Boolean,
-    proinfo: {
-      type: Object,
-      required: true
-    },
-    fields: {
-      type: Object,
-      required: true
-    },
-    fieldsvalue: {
-      type: Object,
-      required: true
-    },
-    steps: {
-      type: Array,
-      required: true
-    }
-  },
   data() {
     return {
       formItemLayout: {
@@ -69,33 +50,39 @@ export default {
       partfields: {}
     }
   },
+  props: {
+    action: String,
+    visible: Boolean,
+    proinfo: {
+      type: Object,
+      required: true
+    }
+  },
+  computed: {
+    ...mapState('product', ['fields', 'fieldsvalue', 'steps'])
+  },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: 'dynamic_form_item' });
   },
   methods: {
+    ...mapActions('product', ['dataCRUD']),
     savehandle(e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          for (let val of this.steps) {
-            if (val.process === values.process.key) {
-              this.$message.warning('当前工序已添加')
-              return 
+          if (this.action === 'add') {
+            for (let val of this.steps) {
+              if (val.process === values.process) {
+                this.$message.warning('当前工序已添加')
+                return 
+              }
             }
           }
-          let stateval = {
-            table: this.$store.state.companyinfo.tablename,
-            seq: this.$route.query.seq,
-            name: this.$store.state.copyinfo.name,
-            action: 'add',
-            date: new Date().toLocaleDateString(),
-            company: this.$store.state.copyinfo.company
-          }
-          this.$axios.post('/record/add',{values, stateval}).then(
+          this.dataCRUD({values, seq: this.$route.query.seq, action: this.action}).then(
             res => {
               if (res.data === 'ok') {
-                this.$message.info('信息已保存')
-                this.$emit('refresh')
+                this.$message.info('操作成功')
+                this.$emit('refresh', this.$route.query.seq)
                 this.$emit('cancel')
               } else if (res.data === 'fail') {
                 this.$message.error('操作失败')
@@ -110,12 +97,12 @@ export default {
       })
     },
     changeFields(value) {
-      let data = this.fields[value.key] //数组
-      let variable = {}
+      let data = this.fields[value] //数组
+      let repobj = {}  //每次重新用一个新对象代替
       for(let val of data) {
-        variable[val] = this.fieldsvalue[val]
+        repobj[val] = this.fieldsvalue[val]
       }
-      this.partfields = variable
+      this.partfields = repobj
     }
   }
 };
