@@ -2,7 +2,7 @@
   <div id="record">
     <div id="step" class="slay">
       <div class="nest" v-if="steps.length > 0 ? true : false">
-        <a-steps  direction="vertical">
+        <a-steps :current="steps.length - 1" direction="vertical">
           <a-step
             v-for="item of steps"
             :key="item.id"
@@ -12,7 +12,7 @@
               {{item.date}}
             </span>
             <a-icon slot="icon" :type="icon(item.action)"></a-icon>
-            <p slot="description">员工{{item.name}}执行操作{{'增加记录'}}</p>
+            <p slot="description">员工{{item.name}}执行操作{{item.action === 'add' ? '增加工序' : '修改信息'}}</p>
           </a-step>
         </a-steps>
       </div>
@@ -22,8 +22,8 @@
     </div>
     <div id="operation" class="slay">
       <a-button type="primary" @click="showModal('add')" :disabled="disabled">增加工序</a-button>
-      <a-button type="default" @click="showModal('change')" :disabled="steps.length > 0 ? false : true">修改信息</a-button>
-      <a-button type="danger" @click="showDeleteConfirm" :diabled="steps.length > 0 ? false : true">删除记录</a-button>
+      <a-button type="default" @click="showModal('change')" :disabled="havedone > 0 ? false : true">修改信息</a-button>
+      <a-button type="danger" @click="showDeleteConfirm" :disabled="steps.length > 0 ? false : true">删除记录</a-button>
       <a-button type="dashed" @click="createQrcode" :disabled="!disabled">生成二维码</a-button>
     </div>
     <add-item 
@@ -57,20 +57,22 @@ export default {
   },
   computed: {
     ...mapGetters(["companyinfo"]),
-    ...mapState('product', ['proinfo', 'fields', 'fieldsvalue', 'steps']),
+    ...mapState('product', ['proinfo', 'fields', 'fieldsvalue', 'steps', 'havedone']),
     disabled() {
-      return Object.keys(this.makeHaveData()).length === this.companyinfo.totalprocess
+      return this.havedone === this.companyinfo.totalprocess
     }
   },
   beforeRouteEnter(to, from, next) { //新增情况
     if (to.params.exist === false) {
       next(vm => {
-        vm.$axios.put('/record', {seq: to.query.seq, table: vm.$store.state.companyinfo.tablename}).then(
+        vm.$axios.put('/record', {seq: to.query.seq, table: vm.companyinfo.tablename}).then(
           res => {
             if (res.data === 'ok') {
               vm.$message.success('操作成功')
+              vm.getHavedone(to.query.seq)
             } else if (res.data === 'fail') {
               vm.$message.error('操作失败')
+              return Promise.reject('fail')
             } 
           }
         ).catch(
@@ -82,12 +84,15 @@ export default {
     } else if (to.params.exist === true) {
       next(vm => {
         vm.$message.success('操作成功')
+        vm.getHavedone(to.query.seq)
       })
     }
   },
   mounted() {
     if (this.$route.params.exist === true) {
       this.getFlashValue(this.$route.query.seq)
+    } else {
+      this.clearSteps();
     }
   },
   //不使用beforeCreate,data观测和event|watcher尚未配置
@@ -95,15 +100,16 @@ export default {
     this.getProinfo()
   },
   methods: {
-    ...mapActions('product', ['getProinfo', 'getFlashValue']),
+    ...mapMutations('product', ['clearSteps']),
+    ...mapActions('product', ['getProinfo', 'getFlashValue', 'getHavedone']),
     makeHaveData() {
       let readydata = {}
-      this.steps.map((value) => {     //根据记录生成已经操作过的工序
-        return value.process
-      }).forEach((value, index, arr) => {
-        if (arr.indexOf(value) === index) {
-          readydata[value] = this.proinfo[value]
-        }
+      let arr = [];
+      for (let i = 1; i <= this.havedone; i++) {
+        arr.push('process' + i)     //根据已添加过得工序生成可修改的工序项
+      }
+      arr.forEach((value, index) => {
+        readydata[value] = this.proinfo[value]
       })
       return readydata
     },

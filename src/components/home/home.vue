@@ -21,9 +21,33 @@
     </div>
     <p class="bot">如果你还没有登录，请前去<span @click="toLog">登录</span></p>
     <div class="ask">
-      <a-icon type="qq" style="fontSize:25px" />
-      <a-icon type="phone" style="fontSize:25px;margin: 0 50px" />
-      <a-icon type="message" style="fontSize:25px" />
+      <a-popover placement="top">
+        <template slot="content">
+          <p>1981472184</p>
+        </template>
+        <template slot="title">
+          <span>QQ</span>
+        </template>
+        <a-icon type="qq" style="fontSize:25px" />
+      </a-popover>
+      <a-popover placement="top">
+        <template slot="content">
+          <p>18361812729</p>
+        </template>
+        <template slot="title">
+          <span>Phone</span>
+        </template>
+        <a-icon type="phone" style="fontSize:25px;margin: 0 50px" />
+      </a-popover>
+      <a-popover placement="top">
+        <template slot="content">
+          <p>nulibianqiango</p>
+        </template>
+        <template slot="title">
+          <span>WeChat</span>
+        </template>
+        <a-icon type="message" style="fontSize:25px" />
+      </a-popover>
     </div>
   </div>
 </template>

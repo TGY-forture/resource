@@ -34,7 +34,7 @@
   </a-modal>
 </template>
 <script>
-import {mapState, mapActions} from 'vuex'
+import {mapState, mapMutations, mapActions} from 'vuex'
 export default {
   name: "AddItem",
   data() {
@@ -59,29 +59,34 @@ export default {
     }
   },
   computed: {
-    ...mapState('product', ['fields', 'fieldsvalue', 'steps'])
+    ...mapState('product', ['fields', 'fieldsvalue', 'steps', 'havedone'])
   },
   beforeCreate() {
     this.form = this.$form.createForm(this, { name: 'dynamic_form_item' });
   },
   methods: {
+    ...mapMutations('product', ['setHavedone']),
     ...mapActions('product', ['dataCRUD']),
     savehandle(e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          if (this.action === 'add') {
-            for (let val of this.steps) {
-              if (val.process === values.process) {
-                this.$message.warning('当前工序已添加')
-                return 
-              }
+          if (this.action === 'add') {   //不能重复添加同一工序
+            let selectnum = parseInt(values.process.slice(7), 10)
+            if (selectnum !== this.havedone + 1) {
+              this.$message.warning('请按正确的工序步骤添加工序');
+              return
+            } else {
+              values.havedone = this.havedone + 1
             }
           }
           this.dataCRUD({values, seq: this.$route.query.seq, action: this.action}).then(
             res => {
               if (res.data === 'ok') {
                 this.$message.info('操作成功')
+                if (this.action === 'add') {
+                  this.setHavedone(this.havedone + 1)
+                }
                 this.$emit('refresh', this.$route.query.seq)
                 this.$emit('cancel')
               } else if (res.data === 'fail') {

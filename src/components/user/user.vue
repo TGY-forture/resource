@@ -46,7 +46,6 @@
 </template>
 
 <script>
-
 import {mapMutations, mapState, mapGetters, mapActions} from 'vuex'
 export default {
   name: "User",

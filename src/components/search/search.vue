@@ -5,13 +5,22 @@
         <a-date-picker v-decorator="['date',{rules:[{type: 'object'}]}]" />
       </a-form-item>
       <a-form-item label="产品编号">
-        <a-input class="pro-num pro" v-decorator="['seq']" allow-clear></a-input>
+        <a-input v-decorator="['seq']" allow-clear></a-input>
       </a-form-item>
-      <a-form-item label="负责人">
-        <a-input class="pro-man pro" v-decorator="['manager']" allow-clear></a-input>
+      <a-form-item label="公司">
+        <a-select 
+          v-decorator="['company']"
+          show-arrow
+          style="min-width: 193px"
+          allow-clear
+        >
+          <a-select-option v-for="item in totalcompany" :value="item.company" :key="item.totalprocess">
+            {{item.company}}
+          </a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item label="生产批次">
-        <a-input class="pro-cnt pro" v-decorator="['batch']" allow-clear></a-input>
+        <a-input v-decorator="['batch']" allow-clear></a-input>
       </a-form-item>
       <a-row>
         <a-col :span="24" :style="{ textAlign: 'left' }">
@@ -22,7 +31,7 @@
     </a-form>
     <div class="search-result-list" v-if="reshow">搜索结果</div>
     <div v-else>
-      <a-table :columns="columns" :data-source="dat" :pagination="false" :row-key="(record) => record.id">
+      <a-table :columns="columns" :data-source="chdata" :pagination="false" :row-key="(record) => record.id">
         <template slot="detail" slot-scope="text,record">
           <a slot="detail" @click="getDat(record)">查看</a>
         </template>  
@@ -44,6 +53,7 @@
 
 <script>
 // E:\WebDoc\resource\node_modules\async-validator\dist-web\index.js 注释验证警告
+import {mapActions, mapState} from 'vuex'
 import moment from "moment";
 const columns = [
   {
@@ -63,8 +73,8 @@ const columns = [
     dataIndex: "date"
   },
   {
-    title: "负责人",
-    dataIndex: "manager"
+    title: "公司",
+    dataIndex: "company"
   },
   {
     title: "详细信息",
@@ -76,60 +86,69 @@ export default {
   name: "Search",
   data() {
     return {
-      sourcedat: null,
-      dat: null,
+      sourcedata: [],
+      chdata: [],
       columns,
       total: 0,
       spinning: false,
-      reshow: true,
-      form: this.$form.createForm(this, { name: "advanced_search" })
+      reshow: true
     };
   },
+  computed: {
+    ...mapState('search', ['totalcompany'])
+  },
+  beforeCreate() {
+    this.form = this.$form.createForm(this, { name: "advanced_search" })
+  },
+  mounted() {
+    this.pullData()
+  },
   methods: {
-    getDat(value) {
-      console.log(value)
-    },
+    moment,
+    ...mapActions('search', ['pullData']),
     handleSearch(e) {
       e.preventDefault();
       const value = this.form.getFieldsValue()
-      for (let key in value) {
-        value[key] ? null : delete(value[key])
-      }
-      if (Object.keys(value).length == 0) return
-      this.spinning = true
-      if (value.date) {
-        value.date = value.date.format('YYYY-MM-DD')
-      }
-      this.$axios.get('/search', {
-        params: value
-      }).then(
-        (res) => {
-          this.spinning = false
-          if (res.data != 'err') {
-            this.reshow = false
-            this.dat = res.data.slice(0, 7)
-            this.sourcedat = res.data
-            this.total = res.data.length
-            // console.log(res.data)
-          } else {
-            throw(new Error('服务器故障'))
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          for (let key in values) {    //删除没有选择值的条件项
+            values[key] ? null : delete values[key];
           }
+          if (Object.keys(values).length === 0) return;
+          if (!!values.date) {
+            values.date = value.date.format('YYYY-MM-DD')
+          }
+          this.spinning = true;
+          this.$axios.get('/search/data', {params: values}).then(
+            (res) => {
+              this.spinning = false
+              if (res.data !== 'fail') {
+                this.reshow = false;
+                this.sourcedata = res.data;
+                this.total = res.data.length;
+                this.chdata = this.sourcedata.slice(0, 7)
+              }
+            }
+          ).catch(
+            (err) => {
+              this.spinning = false
+              console.error(err)
+            }
+          )
         }
-      ).catch(
-        (errval) => {
-          this.$message.error(errval.message)
-        }
-      )
+      })
     },
     handleReset() {
       this.form.resetFields();
-      this.dat = null
-      this.total = 0
+      this.chdata = [];
+      this.total = 0;
     },
-    moment,
     onChange(pageNumber) {
       let start = (pageNumber - 1) * 7
-      this.dat = this.sourcedat.slice(start, start + 7)
+      this.chdata = this.sourcedata.slice(start, start + 7)
+    },
+    getDat(value) {
+      console.log(value)
     }
   }
 };

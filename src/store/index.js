@@ -111,11 +111,9 @@ export default new Vuex.Store({
         proinfo: {},      //工序名称
         fields: {},       //工序对应字段名
         fieldsvalue: {},  //字段对应值
-        steps: []         //步骤信息
+        steps: [],        //步骤信息,
+        havedone: 0       //当前已完成的工序
       }),
-      getters: {
-
-      },
       mutations: {
         injectdata(state, value) {      //模块中接收 mutations 的 state 为局部的 state
           state.proinfo = value[0][0]  //每道工序名称
@@ -136,6 +134,12 @@ export default new Vuex.Store({
               return 0
             }
           })
+        },
+        setHavedone(state, value) {
+          state.havedone = value
+        },
+        clearSteps(state) {
+          state.steps = []
         }
       },
       actions: {
@@ -179,6 +183,45 @@ export default new Vuex.Store({
             company: rootGetters.company
           }
           return axios.post('/record',{values: additional.values, stateval})
+        },
+        getHavedone({commit, rootGetters}, seq) {
+          axios.get('/record/pronum', {params: {seq, tablename: rootGetters.companyinfo.tablename}}).then(
+            res => {
+              if (res.data !=='fail') {
+                commit('setHavedone', res.data.havedone)
+              } else {
+                console.error('can not get "havecode"!')
+              }
+            }
+          ).catch(
+            err => {
+              console.error(err)
+            }
+          )
+        }
+      }
+    },
+    search: {
+      namespaced: true,
+      state: () => ({
+        totalcompany: []
+      }),
+      mutations: {
+        init(state, value) {
+          state.totalcompany = value
+        }
+      },
+      actions: {
+        pullData({commit}) {
+          axios.get('/search').then(
+            res => {
+              commit('init', res.data)
+            }
+          ).catch(
+            err => {
+              console.error(err)
+            }
+          )
         }
       }
     }
