@@ -3,7 +3,9 @@
     <Top class="top" />
     <Lside class="lside" />
     <Rside class="rside">
-      <router-view></router-view>
+      <keep-alive include="Search">  <!--和 transition 使用时 transition 放在外面-->
+        <router-view></router-view>
+      </keep-alive>
     </Rside>
   </div>
 </template>

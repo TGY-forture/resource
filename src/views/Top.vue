@@ -1,7 +1,7 @@
 <template>
   <div id="top">
     <p>Fantasy Factory</p>
-    <a-input-search placeholder="请输入产品编号" enter-button style="width:300px;margin-right:50px" />     
+    <!-- <a-input-search placeholder="请输入产品编号" enter-button style="width:300px;margin-right:50px" />      -->
     <a-avatar size="default" :src="avatar" style="cursor:pointer"/>
     <span class="user">{{nickname}}</span>
     <a-icon type="logout" style="font-size:24px;cursor:pointer" @click="logout"/>

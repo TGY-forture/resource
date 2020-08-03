@@ -65,7 +65,7 @@ export default {
   beforeRouteEnter(to, from, next) { //新增情况
     if (to.params.exist === false) {
       next(vm => {
-        vm.$axios.put('/record', {seq: to.query.seq, table: vm.companyinfo.tablename}).then(
+        vm.$axios.put('/record', {seq: to.query.seq, batch: to.query.batch, table: vm.companyinfo.tablename}).then(
           res => {
             if (res.data === 'ok') {
               vm.$message.success('操作成功')
@@ -164,7 +164,23 @@ export default {
       });
     },
     createQrcode() { 
-      let seq = this.$route.query.seq
+      let seq = this.$route.query.seq;
+      let values = {
+        seq,
+        name: this.companyinfo.proname,
+        date: new Date().toLocaleDateString(),
+        company: this.companyinfo.company,
+        batch: '123445'       //this.fieldsvalue.batch
+      }
+      this.$axios.post('/', {...values}).then(
+        res => {
+          console.log(res.data)
+        }
+      ).catch(
+        err => {
+          console.error(err)
+        }
+      )
       QRCode.toDataURL(`http://localhost:8081/search?seq=${seq}`, {width: 200}).then(
         url => {
           this.src = url

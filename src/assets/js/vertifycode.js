@@ -1,3 +1,5 @@
+import $ from 'jquery'
+
 function draw(show_num) {
   var canvas_width = $("#canvas").width();
   var canvas_height = $("#canvas").height();

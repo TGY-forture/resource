@@ -78,7 +78,8 @@
 <script>
 import { draw, randomColor } from "@/assets/js/vertifycode";
 import { mapMutations, mapActions } from 'vuex'
-import {docCookies} from '@/assets/js/cookie'
+import {docCookies} from '@/assets/js/cookie';
+import $ from 'jquery'
 export default {
   name: "Log",
   data() {

@@ -148,7 +148,7 @@ export default {
       this.chdata = this.sourcedata.slice(start, start + 7)
     },
     getDat(value) {
-      console.log(value)
+      this.$router.push({name: 'show', params: {seq: value.seq, company: value.company}})
     }
   }
 };

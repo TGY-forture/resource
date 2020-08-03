@@ -3,12 +3,13 @@
     <div class="up-index" v-show="true">
       <a-input placeholder="请输入产品编号" allow-clear class="pu-inp" v-model="seq" />
       <a-popconfirm 
-        placement="top" ok-text="Yes" 
-        cancel-text="No" :visible="pop" 
+        placement="top" ok-text="ok" 
+        cancel-text="close" :visible="pop" 
         @cancel="pop = false" @confirm="confirm"
       >
+        <a slot="icon"></a>
         <template slot="title">
-          <p>当前数据不存在,是否添加?</p>
+          <a-input :value="batch" placeholder="请输入产品编号"></a-input>
         </template>
         <a-button html-type="button" :loading="loading" @click="getFirstDat">确定</a-button>
       </a-popconfirm>
@@ -23,6 +24,7 @@ export default {
   data() {
     return {
       seq: '',
+      batch: '',
       pop: false,
       loading: false,
     };
@@ -31,6 +33,9 @@ export default {
     ...mapGetters(['companyinfo']),
     regseq() {
       return RegExp(this.companyinfo.seq)
+    },
+    regbatch() {
+      return RegExp(this.companyinfo.batch)
     }
   },
   methods: {
@@ -53,9 +58,10 @@ export default {
       )
     },
     confirm() {
+      if (!this.regbatch.test(this.batch)) return;
       this.pop = false;
-      this.$nextTick(() => {
-        this.$router.push({name: 'record', params: {exist:false}, query: {seq: this.seq}})
+      this.$nextTick(() => {  //待修改
+        this.$router.push({name: 'record', params: {exist:false}, query: {seq: this.seq, batch: this.batch}})
       })
     }
   },
@@ -78,9 +84,12 @@ export default {
     }
   }
 }
-.ant-modal-root {
+.ant-modal-root {      //不在当前组件样式下，全局的
   .ant-input {
     width: 200px;
   }
 }
+.ant-popover-message-title {   //不在当前组件样式下，全局的
+    padding-left: 0;
+  }
 </style>
