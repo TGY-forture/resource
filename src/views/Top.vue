@@ -56,7 +56,7 @@ export default {
     cursor: default;
   }
   .user {
-    margin-right: 50px;
+    margin-right: 20px;
     margin-left: 10px;
   }
 }

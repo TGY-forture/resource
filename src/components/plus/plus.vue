@@ -9,7 +9,7 @@
       >
         <a slot="icon"></a>
         <template slot="title">
-          <a-input :value="batch" placeholder="请输入产品编号"></a-input>
+          <a-input v-model="batch" placeholder="请输入产品编号"></a-input>
         </template>
         <a-button html-type="button" :loading="loading" @click="getFirstDat">确定</a-button>
       </a-popconfirm>
@@ -32,10 +32,10 @@ export default {
   computed: {
     ...mapGetters(['companyinfo']),
     regseq() {
-      return RegExp(this.companyinfo.seq)
+      return new RegExp(this.companyinfo.seq)
     },
     regbatch() {
-      return RegExp(this.companyinfo.batch)
+      return new RegExp(this.companyinfo.batch)
     }
   },
   methods: {

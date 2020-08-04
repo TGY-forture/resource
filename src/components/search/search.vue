@@ -54,7 +54,6 @@
 <script>
 // E:\WebDoc\resource\node_modules\async-validator\dist-web\index.js 注释验证警告
 import {mapActions, mapState} from 'vuex'
-import moment from "moment";
 const columns = [
   {
     title: "产品名称",
@@ -104,7 +103,6 @@ export default {
     this.pullData()
   },
   methods: {
-    moment,
     ...mapActions('search', ['pullData']),
     handleSearch(e) {
       e.preventDefault();
@@ -148,7 +146,7 @@ export default {
       this.chdata = this.sourcedata.slice(start, start + 7)
     },
     getDat(value) {
-      this.$router.push({name: 'show', params: {seq: value.seq, company: value.company}})
+      this.$router.push({name: 'show', query: {seq: value.seq, company: value.company}})
     }
   }
 };

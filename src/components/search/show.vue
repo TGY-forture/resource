@@ -66,7 +66,7 @@ export default {
     detail() {
       let val = [];
       for (let key in this.items[0]) {
-        if (key !== 'seq' && key !== 'id' && key !== 'havedone') {
+        if (key !== 'seq' && key !== 'id' && key !== 'havedone' && key !== 'batch') {
           val.push({
             description: this.items[0][key],
             detailvalue: this.items[1][key]
@@ -90,8 +90,8 @@ export default {
     }
   },
   beforeMount() {
-    let params = this.$route.params;
-    this.$axios.get('/', {params: {seq: params.seq, company: params.company}}).then(
+    let query = this.$route.query;
+    this.$axios.get('/', {params: {seq: query.seq, company: query.company}}).then(
       res => {
         if (res.data !== 'fail') {
           this.basicinfo = res.data[0];
