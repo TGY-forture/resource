@@ -41,7 +41,7 @@ export default {
       Email.send({
         Host: "smtp.qq.com",
         Username: "1981472184@qq.com",
-        Password: "nvkbcegedskofbbf",
+        Password: "your password",
         To: '1453836790@qq.com',
         From: "1981472184@qq.com",
         Subject: "密码找回",
