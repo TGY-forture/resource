@@ -33,6 +33,7 @@ export default {
   },
   methods: {
     sendEmail() {
+      if (!/@/.test(this.code)) return;
       this.loading = true;
       let code;
       do {
@@ -41,8 +42,8 @@ export default {
       Email.send({
         Host: "smtp.qq.com",
         Username: "1981472184@qq.com",
-        Password: "your password",
-        To: '1453836790@qq.com',
+        Password: "",
+        To: this.code,
         From: "1981472184@qq.com",
         Subject: "密码找回",
         Body: "你的验证码为：" + code

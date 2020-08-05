@@ -212,7 +212,7 @@ export default {
         .post("/", { ...values })
         .then((res) => {
           if (res.data === "ok" || res.data === "exist") {
-            QRCode.toDataURL(`http://10.146.232.80:8081/show?seq=${seq}&company=` + encodeURI(this.companyinfo.comapny), {
+            QRCode.toDataURL(`http://10.146.232.80:8081/show?seq=${seq}&company=` + this.companyinfo.comapny, {
               width: 200,
             })
               .then((url) => {

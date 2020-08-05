@@ -8,7 +8,7 @@ import Antd from 'ant-design-vue'   //引入全部ant-design-vue组件
 import 'ant-design-vue/dist/antd.css'
 Vue.use(Antd)
 
-Vue.prototype.$axios = axios
+Vue.prototype.$axios = axios;     //将axios绑定到Vue的原型上
 
 Vue.config.productionTip = false
 

@@ -9,7 +9,3 @@ export default {
   name: 'Rside'
 }
 </script>
-
-<style>
-
-</style>

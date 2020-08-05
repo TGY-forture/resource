@@ -60,7 +60,7 @@ export default {
     confirm() {
       if (!this.regbatch.test(this.batch)) return;
       this.pop = false;
-      this.$nextTick(() => {  //待修改
+      this.$nextTick(() => {  
         this.$router.push({name: 'record', params: {exist:false}, query: {seq: this.seq, batch: this.batch}})
       })
     }

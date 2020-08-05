@@ -132,7 +132,7 @@ export default {
                     this.getCompanyinfo() //得到用户公司数据
                     this.$message.success({ content: '数据加载成功', key: 'loading'})
                     if (preuser) { //将已经登录的不同用户下线
-                      this.$axios.put('/log', {preuser, username: values.username})
+                      this.$axios.put('/log', {username: preuser})
                     }
                   } else {
                     this.$message.error({ content: '数据加载失败', key: 'loading'})
@@ -141,7 +141,8 @@ export default {
               }
             ).catch(
               (err) => {
-                this.loading = false
+                this.loading = false;
+                this.$message.error('连接超时或其它错误');
                 console.error(err)
             });
         }

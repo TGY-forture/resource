@@ -23,12 +23,23 @@ export default {
     Lside,
     Rside,
   },
-  mounted,
+  mounted, 
   methods: {
     ...mapMutations(["initUserinfo"]),
     ...mapActions(["getAvatar", "getCompanyinfo"]),
   },
 };
+
+window.addEventListener('beforeunload', logData, false);
+function logData() {
+  const data = new FormData();
+  const username = docCookies.getItem('username');
+  if (username) {
+    data.append('username', username);
+    navigator.sendBeacon("http://localhost:3000/log/logout", data);
+  }
+}
+
 function mounted() {
   //用户已经登录时点击浏览器刷新按钮时重新加载数据到vuex
   let username = docCookies.getItem("username");
@@ -45,6 +56,8 @@ function mounted() {
         (err) => {
         console.error(err);
       });
+      //更新登录状态
+      this.$axios.put('/log/refresh', {username});  
   }
 }
 </script>
