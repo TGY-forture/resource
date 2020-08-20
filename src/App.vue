@@ -36,7 +36,7 @@ function logData() {
   const username = docCookies.getItem('username');
   if (username) {
     data.append('username', username);
-    navigator.sendBeacon("http://localhost:3000/log/logout", data);
+    navigator.sendBeacon("https://www.tserch.xyz:3000/log/logout", data);
   }
 }
 

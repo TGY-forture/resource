@@ -1,77 +1,56 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {axios} from '@/assets/js/axios'
+import moment from 'moment'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    userinfo: {
-      nickname: 'Hello',
-      age: 18,
-      sex: 'woman',
-      username: '',
-      email: ''
-    },
+    userinfo: {},
     companyinfo: {},
-    copyinfo: {
-      company: ''
-    },
     avatar: ''
   },
   getters: {
     nickname(state) {
-      return state.userinfo.nickname;
+      return state.userinfo.nickname ? state.userinfo.nickname: 'hello';
     },
     username(state) {
       return {username: state.userinfo.username}
     },
-    commonuser(state) {
-      return state.userinfo.username
-    },
     company(state) {
-      return state.copyinfo.company
+      return state.userinfo.company
     },
     name(state) {
-      return state.copyinfo.name
+      return state.userinfo.name
     },
     stranger(state) {
-      return state.copyinfo.company == '' ? true : false
-    },
-    companyinfo(state) {
-      return state.companyinfo
+      return state.userinfo.company == '' ? true : false
     }
   },
   mutations: {
     initUserinfo(state, value) {
-      for (let key in state.userinfo) {
-        state.userinfo[key] = value[key]
-      }
-      state.copyinfo = value
+      state.userinfo = value
     },
     initAvatar(state, bloburl) {
       state.avatar = bloburl
     },
-    resetUserinfo(state, value) {
-      state.userinfo = value
+    resetUserinfo(state, payload) {
+      state.userinfo.age = payload.age;
+			state.userinfo.sex = payload.sex;
+			state.userinfo.nickname = payload.nickname;
+			state.userinfo.email = payload.email;
     },
     initCompanyinfo(state, value) {
       state.companyinfo = value.data
     },
-    resetRootinfo() {
-      let sourcedata = {
-        userinfo: {nickname: 'Hello',age: 18,sex: 'woman',username: '',email: ''},
-        companyinfo: {},
-        copyinfo: {
-          company: ''
-        },
-        avatar: ''
-      }
-      this.replaceState(sourcedata)
+    resetRootinfo(state) {
+      state.userinfo = {};
+      state.avatar = '';
     },
     addInfo(state, data) {
-      state.copyinfo.name = data.name 
-      state.copyinfo.company = data.company 
+      state.userinfo.name = data.name 
+      state.userinfo.company = data.company 
     }
   },
   actions: {
@@ -90,8 +69,8 @@ export default new Vuex.Store({
       )
     },
     getCompanyinfo({commit, state}) {
-      if (!state.copyinfo.company) return  //用户未完成员工认证则不获取工厂数据
-      axios.get('/addinfo/all', {params: {company: state.copyinfo.company}}).then(
+      if (!state.userinfo.company) return;  //用户未完成员工认证则不获取工厂数据
+      axios.get('/addinfo/all', {params: {company: state.userinfo.company}}).then(
         (res) => {
           if (res.data !== 'fail') {
             commit({type: 'initCompanyinfo', data: res.data})
@@ -117,12 +96,12 @@ export default new Vuex.Store({
       mutations: {
         injectdata(state, value) {      //模块中接收 mutations 的 state 为局部的 state
           state.proinfo = value[0][0]  //每道工序名称
-            let items = value[0][1]      //每道工序所需添加信息对应的字段名
-            for(let key in items) {         //将字段名拆分为数组
-              items[key] = items[key].split('&')
-            }
-            state.fields = items;
-            state.fieldsvalue = value[1]
+          let items = value[0][1]      //每道工序所需添加信息对应的字段名
+          for(let key in items) {         //将字段名拆分为数组
+            items[key] = items[key].split('&')
+          }
+          state.fields = items;
+          state.fieldsvalue = value[1]
         },
         flashsteps(state, data) {
           state.steps = data.sort((previous, after) => {
@@ -137,18 +116,15 @@ export default new Vuex.Store({
         },
         setHavedone(state, value) {
           state.havedone = value
-        },
-        clearSteps(state) {
-          state.steps = []
         }
       },
       actions: {
-        getProinfo({rootGetters, commit}) {
+        getProinfo({rootState, commit}) {
           axios.get("/record", {
             params: {
-              tablename: rootGetters.companyinfo.tablename,
-              totalprocess: rootGetters.companyinfo.totalprocess,
-              company: rootGetters.companyinfo.company,
+              tablename: rootState.companyinfo.tablename,
+              totalprocess: rootState.companyinfo.totalprocess,
+              company: rootState.companyinfo.company,
             }
           })
           .then((res) => {
@@ -179,13 +155,13 @@ export default new Vuex.Store({
             seq: additional.seq,
             name: rootGetters.name,
             action: additional.action,
-            date: new Date().toLocaleDateString(),
+            date: moment(new Date()).format("YYYY-MM-DD"),
             company: rootGetters.company
           }
           return axios.post('/record',{values: additional.values, stateval})
         },
-        getHavedone({commit, rootGetters}, seq) {
-          axios.get('/record/pronum', {params: {seq, tablename: rootGetters.companyinfo.tablename}}).then(
+        getHavedone({commit, rootState}, seq) {
+          axios.get('/record/pronum', {params: {seq, tablename: rootState.companyinfo.tablename}}).then(
             res => {
               if (res.data !=='fail') {
                 commit('setHavedone', res.data.havedone)

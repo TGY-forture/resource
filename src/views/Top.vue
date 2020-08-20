@@ -13,21 +13,21 @@ import {mapState, mapGetters, mapMutations} from 'vuex';
 export default {
   name: 'Top',
   computed: {
-    ...mapGetters(['nickname', 'commonuser']),
-    ...mapState(['avatar'])
+    ...mapGetters(['nickname']),
+    ...mapState(['avatar', 'userinfo'])
   },
   methods: {
     ...mapMutations(['resetRootinfo']),
     logout() {
-      if (this.commonuser === '') return
-      this.$axios.put('/log', {username: this.commonuser}).then(
+      if (this.userinfo.username === '') return;
+      this.$axios.put('/log', {username: this.userinfo.username}).then(
         res => {
           if (res.data === 'ok') {
             this.$message.warning('已下线!')
             if (this.$route.name !== 'home') {
               this.$router.push('/home')
             }
-            this.resetRootinfo()
+            this.resetRootinfo()  //替换 vuex根节点, 影响了 search模块, bug已解决
           } else {
             this.$message.warning('操作失败')
           }

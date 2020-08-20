@@ -5,7 +5,7 @@
         <a-avatar :size="200" :src="avatar"/>
         <a-upload
           name="avatar"
-          action="http://localhost:3000/user"
+          action="https://www.tserch.xyz:3000/user"
           @change="handleChange"
           list-type="picture"
           accept="image/*"
@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     ...mapState(['avatar', 'userinfo']),
-    ...mapGetters(['username', 'commonuser'])
+    ...mapGetters(['username'])
   },
   methods: {
     saveInfo(e) {
@@ -65,7 +65,7 @@ export default {
             (res) => {
               if (res.data === 'ok') {
                 this.$message.success('保存成功')
-                this.resetUserinfo(values)
+                this.resetUserinfo(values)    //改变用户信息
               } else if (res.data === 'fail') {
                 this.$message.error('保存失败')
               }
@@ -93,7 +93,13 @@ export default {
     ...mapActions(['getAvatar'])
   },
   mounted() { 
-    this.form.setFieldsValue(this.userinfo);
+    this.form.setFieldsValue({
+      username: this.userinfo.username,
+      nickname: this.userinfo.nickname,
+      age: this.userinfo.age,
+      sex: this.userinfo.sex,
+      email: this.userinfo.email
+    });
   }
 };
 // 辅助转换函数

@@ -263,7 +263,7 @@ export default {
 #sign {
   .sign-top {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     p {
       font-size: 20px;
       font-weight: bold;

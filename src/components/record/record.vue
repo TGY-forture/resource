@@ -59,7 +59,7 @@
 <script>
 import AddItem from "./additem";
 import QRCode from "qrcode";
-import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 import moment from "moment";
 
 export default {
@@ -78,7 +78,7 @@ export default {
     AddItem,
   },
   computed: {
-    ...mapGetters(["companyinfo"]),
+    ...mapState(['companyinfo']),
     ...mapState("product", [
       "proinfo",
       "fields",
@@ -106,7 +106,6 @@ export default {
               vm.getHavedone(to.query.seq);
             } else if (res.data === "fail") {
               vm.$message.error("操作失败");
-              return Promise.reject("fail");
             }
           })
           .catch((err) => {
@@ -121,18 +120,13 @@ export default {
     }
   },
   mounted() {
-    if (this.$route.params.exist === true) {
-      this.getFlashValue(this.$route.query.seq);
-    } else {
-      this.clearSteps();
-    }
+    this.getFlashValue(this.$route.query.seq);
   },
   //不使用beforeCreate,data观测和event|watcher尚未配置
   created() {
     this.getProinfo();
   },
   methods: {
-    ...mapMutations("product", ["clearSteps"]),
     ...mapActions("product", ["getProinfo", "getFlashValue", "getHavedone"]),
     makeHaveData() {
       let readydata = {};
@@ -212,11 +206,11 @@ export default {
         .post("/", { ...values })
         .then((res) => {
           if (res.data === "ok" || res.data === "exist") {
-            QRCode.toDataURL(`http://10.146.232.80:8081/show?seq=${seq}&company=` + this.companyinfo.comapny, {
+            QRCode.toDataURL(`https://www.tserch.xyz/show?seq=${seq}&company=` + this.companyinfo.company, {
               width: 200,
             })
               .then((url) => {
-                this.loading = false;
+                this.loading = false; 
                 this.src = url;
                 this.$confirm({
                   title: "success!",
@@ -327,7 +321,7 @@ export default {
   #operation {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: space-around;
     align-items: center;
     .ant-btn {
       width: 200px;

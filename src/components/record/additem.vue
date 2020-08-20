@@ -119,7 +119,7 @@ export default {
   justify-content: center;
   .ant-form-item-control {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
   }
 }
 </style>

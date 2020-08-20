@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapState} from 'vuex'
 export default {
   name: "Plus",
   data() {
@@ -30,7 +30,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['companyinfo']),
+    ...mapState(['companyinfo']),
     regseq() {
       return new RegExp(this.companyinfo.seq)
     },
@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     getFirstDat() {
-      if (!this.regseq.test(this.seq)) return
+      if (!this.regseq.test(this.seq)) return;
       this.loading = true;
       this.$axios.get('/plus', {params: { seq: this.seq, tablename: this.companyinfo.tablename }}).then(
         res => {

@@ -179,7 +179,7 @@ export default {
   }
   .ant-advanced-search-form {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     align-items: center;
   }
   .u-page {

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import {mapGetters, mapActions, mapMutations} from 'vuex'
+import {mapState, mapGetters, mapMutations} from 'vuex'
 import CollectionCreateForm from "./CollectionCreateForm";
 export default {
   name: "SafetyCertificate",
@@ -38,9 +38,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['commonuser', 'company', 'name', 'stranger']),
+    ...mapState(['userinfo']),
+    ...mapGetters(['company', 'name', 'stranger']),
     disabled() {
-      return this.$store.state.copyinfo.islog === 'active' ? false : true
+      return this.userinfo.islog === 'active' ? false : true
     }
   },
   methods: {
@@ -55,22 +56,16 @@ export default {
       const form = this.$refs.collectionForm.form;
       form.validateFields((err, values) => {
         if (!err) {
-          this.$axios.put('/addinfo', {...values, username: this.commonuser}).then(
+          this.$axios.put('/addinfo', {...values, username: this.userinfo.username}).then(
             res => {
               if (res.data === 'ok') {
                 this.$message.info('认证成功')
                 form.resetFields();
                 this.visible = false;
-                //认证成功后重新获取员工数据
-                return this.$axios.get('/addinfo/part', {params: {username: this.commonuser}})
+                //认证成功后刷新获取员工数据
+                this.addInfo(values);
               } else if (res.data === 'fail') {
                 this.$message.error('认证失败')
-              }
-            }
-          ).then(
-            (res) => {
-              if (res && res.data !== 'fail') {
-                this.addInfo(res.data);
               }
             }
           ).catch(
@@ -81,7 +76,6 @@ export default {
         }
       });
     },
-    ...mapActions(['getCompanyinfo']),
     ...mapMutations(['addInfo'])
   },
 };

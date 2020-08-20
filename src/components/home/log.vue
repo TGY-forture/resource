@@ -91,7 +91,7 @@ export default {
       loading: false
     };
   },
-  mounted() {
+  mounted() {  //初始化验证码
     let _this = this;
     $(function() {
       draw(_this.vertifycode);
@@ -101,10 +101,13 @@ export default {
     });
   },
   methods: {
-    handleSubmit(e) {
+    async handleSubmit(e) {
       e.preventDefault();
-      let preuser = docCookies.getItem('username')
-      this.form.validateFields((err, values) => {
+      let preuser = docCookies.getItem('username')  //检查浏览器当前有没有用户登录
+      if (preuser) { //将已经登录的不同用户下线
+        await this.$axios.put('/log', {username: preuser});
+      }
+      this.form.validateFields((err, values) => {  //验证数据，若无误发起登陆请求
         if (!err) {
           this.loading = true
           this.$axios.post("/log", values).then(
@@ -112,10 +115,9 @@ export default {
               this.loading = false
               if (res.data === 'success') {
                 this.vicon = this.picon = null
-                this.form.resetFields()
+                this.form.resetFields()    //清空表单域数据
                 this.$message.loading({ content: '登陆成功,正在加载数据......', key: 'loading' })
-                return this.$axios.get('/log', {params: {username: values.username}})
-                //已取得用户全部数据
+                return this.$axios.get('/log', {params: {username: values.username}})  //取得用户全部数据
               } else if (res.data === 'empty') {
                 this.$message.warning('该用户不存在')
               } else if (res.data === 'active') {
@@ -127,13 +129,10 @@ export default {
               (res) => {
                 if (res) {
                   if (res.data !== 'fail') {              
-                    this.initUserinfo(res.data) //初始化用户数据到vuex
-                    this.getAvatar()   //获取用户头像
-                    this.getCompanyinfo() //得到用户公司数据
-                    this.$message.success({ content: '数据加载成功', key: 'loading'})
-                    if (preuser) { //将已经登录的不同用户下线
-                      this.$axios.put('/log', {username: preuser})
-                    }
+                    this.initUserinfo(res.data); //初始化用户数据到vuex
+                    this.getAvatar();   //获取用户头像
+                    this.getCompanyinfo(); //得到用户公司数据
+                    this.$message.success({ content: '数据加载成功', key: 'loading'});
                   } else {
                     this.$message.error({ content: '数据加载失败', key: 'loading'})
                   }
@@ -187,7 +186,7 @@ export default {
 #log {
   .log-top {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     p {
       font-size: 20px;
       font-weight: bold;
