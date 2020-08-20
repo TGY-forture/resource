@@ -2,7 +2,7 @@
 node_modules
 /dist
 package-lock.json
-/src/components/help
+src/components/help
 
 # local env files
 .env.local
