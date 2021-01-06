@@ -2,44 +2,47 @@
   <div id="top">
     <p>Fantasy Factory</p>
     <!-- <a-input-search placeholder="请输入产品编号" enter-button style="width:300px;margin-right:50px" />      -->
-    <a-avatar size="default" :src="avatar" style="cursor:pointer"/>
-    <span class="user">{{nickname}}</span>
-    <a-icon type="logout" style="font-size:24px;cursor:pointer" @click="logout"/>
+    <a-avatar size="default" :src="avatar" style="cursor: pointer" />
+    <span class="user">{{ nickname }}</span>
+    <a-icon
+      type="logout"
+      style="font-size: 24px; cursor: pointer"
+      @click="logout"
+    />
   </div>
 </template>
 
 <script>
-import {mapState, mapGetters, mapMutations} from 'vuex';
+import { mapState, mapGetters, mapMutations } from "vuex";
 export default {
-  name: 'Top',
+  name: "Top",
   computed: {
-    ...mapGetters(['nickname']),
-    ...mapState(['avatar', 'userinfo'])
+    ...mapGetters(["nickname"]),
+    ...mapState(["avatar", "userinfo"]),
   },
   methods: {
-    ...mapMutations(['resetRootinfo']),
+    ...mapMutations(["resetRootinfo"]),
     logout() {
-      if (this.userinfo.username === '') return;
-      this.$axios.put('/log', {username: this.userinfo.username}).then(
-        res => {
-          if (res.data === 'ok') {
-            this.$message.warning('已下线!')
-            if (this.$route.name !== 'home') {
-              this.$router.push('/home')
+      if (this.userinfo.username == "") return;
+      this.$axios
+        .put("/log", { username: this.userinfo.username })
+        .then((res) => {
+          if (res.data === "ok") {
+            this.$message.warning("已下线!");
+            if (this.$route.name !== "home") {
+              this.$router.push("/home");
             }
-            this.resetRootinfo()  //替换 vuex根节点, 影响了 search模块, bug已解决
+            this.resetRootinfo(); //替换 vuex根节点, 影响了 search模块, bug已解决
           } else {
-            this.$message.warning('操作失败')
+            this.$message.warning("操作失败");
           }
-        }
-      ).catch(
-        err => {
-          console.error(err)
-        }
-      )
-    }
-  }
-}
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
