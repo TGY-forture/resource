@@ -25,7 +25,7 @@ export default new Vuex.Store({
       return state.userinfo.name
     },
     stranger(state) {
-      return state.userinfo.company == '' ? true : false
+      return state.userinfo.company ? false : true
     }
   },
   mutations: {
